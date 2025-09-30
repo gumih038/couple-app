@@ -93,20 +93,21 @@ function bootstrap(){
 }
 function connectFirebase(config){
   try{
-    // 既存のFirebaseアプリがあれば削除
-    const existingApps = typeof firebase !== 'undefined' ? firebase.apps : [];
-    
     const app = initializeApp(config);
     db = getDatabase(app);
 
-    document.getElementById('firebaseSetup').classList.add('hidden');
-    document.getElementById('roleSelect').classList.remove('hidden');
+    // すべての画面を非表示にしてから役割選択画面を表示
+    document.getElementById('firebaseSetup').style.display = 'none';
+    document.getElementById('roleSelect').style.display = 'block';
+    document.getElementById('mainApp').style.display = 'none';
 
     const setRole = (role)=>{
       userRole = role;
       localStorage.setItem('userRole', role);
-      document.getElementById('roleSelect').classList.add('hidden');
-      document.getElementById('mainApp').classList.remove('hidden');
+      
+      // 役割選択画面を非表示、メインアプリを表示
+      document.getElementById('roleSelect').style.display = 'none';
+      document.getElementById('mainApp').style.display = 'flex';
       
       const header = document.getElementById('header');
       const headerTitle = document.getElementById('headerTitle');
@@ -125,7 +126,7 @@ function connectFirebase(config){
       initApp();
     };
 
-    // 既存のイベントリスナーを削除してから新しく追加
+    // 既存のボタンを複製して新しいイベントリスナーを追加
     const boyfriendBtn = document.getElementById('boyfriendBtn');
     const girlfriendBtn = document.getElementById('girlfriendBtn');
     
@@ -148,6 +149,7 @@ function connectFirebase(config){
     localStorage.removeItem('firebaseConfig');
   }
 }
+
 function initApp(){
   setupTabs();
   setupPresence();
