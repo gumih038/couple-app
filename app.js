@@ -161,6 +161,7 @@ function initApp(){
   setupAnniversary();
   setupPeriodTracker();
   setupTimeCapsule();
+  setupHomeReset(); // 追加
 }
 
 // タブ切り替え
@@ -783,4 +784,17 @@ function setupTimeCapsule(){
       capsuleListEl.appendChild(div);
     });
   });
+}
+
+// ホーム画面の初期化ボタン
+function setupHomeReset(){
+  const homeResetBtn = document.getElementById('homeResetBtn');
+  if(homeResetBtn){
+    homeResetBtn.addEventListener('click', ()=>{
+      if(confirm('アプリを初期化して最初の設定画面に戻りますか？\n全てのローカルデータが削除されます。')){
+        localStorage.clear();
+        window.location.href = window.location.pathname;
+      }
+    });
+  }
 }
