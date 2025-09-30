@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>カップル専用アプリ v2.1</title>
+    <title>カップル専用アプリ v2.2</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
+        html, body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
+            height: 100%;
             overflow: hidden;
         }
         .container {
@@ -27,6 +27,7 @@
         .firebase-setup { 
             padding: 30px 20px; 
             overflow-y: auto;
+            height: 100vh;
         }
         .firebase-setup h2 { 
             color: #667eea; 
@@ -79,6 +80,8 @@
         .role-select {
             padding: 40px 20px;
             text-align: center;
+            overflow-y: auto;
+            height: 100vh;
         }
         .role-select h1 {
             color: #667eea;
@@ -163,12 +166,37 @@
             50% { opacity: 0.5; }
         }
 
-        /* メインコンテンツ */
+        /* メインコンテンツ - スクロール可能に修正 */
         .main-content {
             flex: 1;
             overflow-y: auto;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
             padding: 20px;
+            padding-bottom: 40px;
             background: #f8f9fa;
+        }
+
+        /* 通知設定案内 */
+        .notification-guide {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            padding: 15px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .notification-guide strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #92400e;
+        }
+        .notification-guide ol {
+            margin-left: 20px;
+            color: #78350f;
+        }
+        .notification-guide li {
+            margin-bottom: 5px;
         }
 
         /* 気分セクション */
@@ -376,6 +404,7 @@
             padding: 10px;
             background: #f8f9fa;
             border-radius: 10px;
+            -webkit-overflow-scrolling: touch;
         }
         .message {
             margin-bottom: 10px;
@@ -459,7 +488,7 @@
         <!-- Firebase設定画面 -->
         <div id="firebaseSetup" class="firebase-setup">
             <h2>🔧 Firebase設定</h2>
-            <span class="version-tag">v2.1</span>
+            <span class="version-tag">v2.2</span>
             <div class="setup-info">
                 <strong>初回のみ設定が必要です</strong><br>
                 Firebase Consoleで取得した設定情報を入力してください。
@@ -474,7 +503,7 @@
         <!-- 役割選択画面 -->
         <div id="roleSelect" class="role-select hidden">
             <h1>💕 ようこそ</h1>
-            <span class="version-tag">v2.1</span>
+            <span class="version-tag">v2.2</span>
             <p style="color: #666; margin-bottom: 30px;">あなたの役割を選択してください</p>
             <div class="role-buttons">
                 <div class="role-btn boyfriend" id="boyfriendBtn">👨<br>彼氏</div>
@@ -499,8 +528,19 @@
                 </div>
             </div>
 
-            <!-- メインコンテンツ -->
+            <!-- メインコンテンツ（スクロール可能） -->
             <div class="main-content">
+                <!-- 通知設定案内 -->
+                <div class="notification-guide">
+                    <strong>📱 通知を受け取るには</strong>
+                    <ol>
+                        <li>Safariで「共有」ボタンをタップ</li>
+                        <li>「ホーム画面に追加」を選択</li>
+                        <li>追加したアイコンからアプリを開く</li>
+                        <li>これでバックグラウンドでも通知が届きます！</li>
+                    </ol>
+                </div>
+
                 <!-- 相手の気分表示 -->
                 <div class="partner-mood-display">
                     <div class="partner-mood-info">
@@ -587,18 +627,29 @@
 
         // プッシュ通知を表示
         function showPushNotification(title, body) {
+            // ブラウザ通知
             if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification(title, {
+                const notification = new Notification(title, {
                     body: body,
                     icon: '💕',
                     badge: '💕',
-                    vibrate: [200, 100, 200]
+                    tag: 'couple-app',
+                    requireInteraction: false
                 });
+                
+                notification.onclick = function() {
+                    window.focus();
+                    notification.close();
+                };
             }
             
+            // バイブレーション
             if ('vibrate' in navigator) {
                 navigator.vibrate([200, 100, 200]);
             }
+
+            // サウンド通知（iOSでは動作しないため、バイブのみ）
+            console.log('通知:', title, body);
         }
 
         // 初期化
@@ -732,6 +783,8 @@
             });
 
             const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
+            let lastMood = '';
+            
             onValue(ref(db, `${ROOM_ID}/mood/${partnerRole}`), (snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.val();
@@ -739,16 +792,22 @@
                     const status = document.getElementById('partnerMoodStatus');
                     const display = document.querySelector('.partner-mood-display');
                     
+                    // 変更があった場合のみ通知
+                    const shouldNotify = lastMood !== '' && lastMood !== data.mood;
+                    lastMood = data.mood;
+                    
                     if (data.mood === 'bad') {
                         emoji.textContent = '😔';
                         status.textContent = 'あまり良くない';
                         status.className = 'status bad';
                         display.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
                         
-                        showPushNotification(
-                            '⚠️ 気分の変化',
-                            `${partnerRole === 'girlfriend' ? '彼女' : '彼氏'}の気分があまり良くありません`
-                        );
+                        if (shouldNotify) {
+                            showPushNotification(
+                                '⚠️ 気分の変化',
+                                `${partnerRole === 'girlfriend' ? '彼女' : '彼氏'}の気分があまり良くありません`
+                            );
+                        }
                     } else if (data.mood === 'normal') {
                         emoji.textContent = '😐';
                         status.textContent = '普通';
@@ -781,15 +840,21 @@
             });
 
             const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
+            let lastStatus = '';
+            
             onValue(ref(db, `${ROOM_ID}/status/${partnerRole}`), (snapshot) => {
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     document.getElementById('partnerCurrentStatus').textContent = data.text;
                     
-                    showPushNotification(
-                        '📍 ステータス更新',
-                        `${partnerRole === 'girlfriend' ? '彼女' : '彼氏'}: ${data.text}`
-                    );
+                    // 変更があった場合のみ通知
+                    if (lastStatus !== '' && lastStatus !== data.text) {
+                        showPushNotification(
+                            '📍 ステータス更新',
+                            `${partnerRole === 'girlfriend' ? '彼女' : '彼氏'}: ${data.text}`
+                        );
+                    }
+                    lastStatus = data.text;
                 }
             });
         }
@@ -894,6 +959,8 @@
             });
         }
 
+        let lastMessageTime = 0;
+        
         function displayMessage(msg) {
             const chatArea = document.getElementById('chatMessages');
             const div = document.createElement('div');
@@ -911,7 +978,9 @@
             div.appendChild(time);
             chatArea.appendChild(div);
 
-            if (msg.sender !== userRole) {
+            // 通知（自分以外のメッセージで、最新のもののみ）
+            if (msg.sender !== userRole && msg.timestamp > lastMessageTime) {
+                lastMessageTime = msg.timestamp;
                 const partnerName = userRole === 'boyfriend' ? '彼女' : '彼氏';
                 
                 if (msg.type === 'anxiety') {
