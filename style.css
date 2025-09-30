@@ -289,10 +289,8 @@ body{
 
 /* メイン */
 .main-content{
-  flex:1 1 0;
-  min-height:0;
-  height:0;
-  overflow-y:scroll;
+  flex:1;
+  overflow-y:auto;
   overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
   overscroll-behavior:contain;
