@@ -24,11 +24,13 @@ body{
   margin:0 auto;
   background:#fff;
   width:100%;
-  height:100%;
+  height:100vh;
+  height:100dvh;
   display:flex;
   flex-direction:column;
   position:relative;
   animation:fadeIn 0.6s ease-out;
+  overflow:hidden;
 }
 
 @keyframes fadeIn{
@@ -293,13 +295,16 @@ body{
   overflow-y:auto;
   overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
-  padding:20px 20px calc(80px + env(safe-area-inset-bottom));
+  padding:20px;
+  padding-bottom:calc(70px + env(safe-area-inset-bottom));
   background:linear-gradient(180deg,#f8f9fa 0%,#ffffff 100%);
 }
 
 .screen{
   display:none;
+  width:100%;
 }
+
 .screen:not(.hidden){
   display:block;
 }
@@ -942,14 +947,13 @@ body{
 .chat-section-full{
   display:flex;
   flex-direction:column;
-  height:100%;
-  min-height:0;
+  height:calc(100vh - 200px);
+  min-height:500px;
 }
 
 .chat-messages-full{
   flex:1;
-  min-height:0;
-  overflow-y:scroll;
+  overflow-y:auto;
   -webkit-overflow-scrolling:touch;
   padding:20px;
   background:#f8f9fa;
