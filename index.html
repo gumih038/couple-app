@@ -59,7 +59,7 @@
       <div class="main-content">
         <!-- ホーム画面 -->
         <div class="screen" id="homeScreen">
-          <!-- 相手の気分表示 -->
+          <!-- 相手の気分・ステータス統合表示 -->
           <div class="partner-mood-display">
             <div class="partner-mood-info">
               <div class="partner-mood-emoji" id="partnerMoodEmoji">😐</div>
@@ -69,17 +69,15 @@
                 <div class="time-label" id="partnerMoodTime">未設定</div>
               </div>
             </div>
-            <div class="typing-indicator" id="typingIndicator" aria-live="polite"></div>
-          </div>
-
-          <!-- 相手のステータス表示 -->
-          <div class="partner-status-display">
-            <div class="icon">📍</div>
-            <div class="status-info">
-              <div class="text" id="partnerCurrentStatus">ステータス未設定</div>
-              <div class="time-label" id="partnerStatusTime">未設定</div>
+            <div class="partner-status-info">
+              <div class="partner-status-badge">
+                <div class="icon" id="partnerStatusIcon">📍</div>
+                <div class="text" id="partnerCurrentStatus">未設定</div>
+              </div>
+              <div class="partner-status-time" id="partnerStatusTime">未設定</div>
             </div>
           </div>
+          <div class="typing-indicator" id="typingIndicator" aria-live="polite"></div>
 
           <!-- 自分の気分 -->
           <div class="mood-section">
