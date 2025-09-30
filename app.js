@@ -631,3 +631,205 @@ function linkify(text){
   const urlRe = /(https?:\/\/[^\s]+)/g;
   return text.replace(urlRe, '<a href="$1" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">$1</a>');
 }
+
+// 記念日カウンター
+function setupAnniversary(){
+  const anniversaryRef = ref(db, `rooms/${ROOM_ID}/anniversary`);
+  const daysCountEl = document.getElementById('daysCount');
+  const startDateEl = document.getElementById('startDate');
+  const setBtn = document.getElementById('setAnniversaryBtn');
+  
+  setBtn.addEventListener('click', ()=>{
+    const dateStr = prompt('付き合った日を入力してください（例: 2024-01-15）');
+    if(!dateStr) return;
+    
+    const date = new Date(dateStr);
+    if(isNaN(date.getTime())){
+      alert('正しい日付を入力してください');
+      return;
+    }
+    
+    set(anniversaryRef, {
+      startDate: date.getTime(),
+      setBy: userRole
+    });
+  });
+  
+  function updateDisplay(startDate){
+    const now = new Date();
+    const start = new Date(startDate);
+    const diffTime = now - start;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    daysCountEl.textContent = `${diffDays}日目`;
+    startDateEl.textContent = start.toLocaleDateString('ja-JP', {year:'numeric', month:'long', day:'numeric'});
+  }
+  
+  onValue(anniversaryRef, snap=>{
+    if(snap.exists()){
+      const data = snap.val();
+      updateDisplay(data.startDate);
+      setInterval(()=> updateDisplay(data.startDate), 60000);
+    }
+  });
+}
+
+// 女の子の日トラッカー
+function setupPeriodTracker(){
+  const periodRef = ref(db, `rooms/${ROOM_ID}/period`);
+  const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
+  
+  if(userRole === 'girlfriend'){
+    // 彼女側：自分で設定
+    document.getElementById('periodSection').classList.remove('hidden');
+    
+    const startBtn = document.getElementById('periodStartBtn');
+    const endBtn = document.getElementById('periodEndBtn');
+    const statusEl = document.getElementById('periodStatus');
+    
+    startBtn.addEventListener('click', ()=>{
+      set(periodRef, {
+        status: 'active',
+        startDate: Date.now()
+      });
+    });
+    
+    endBtn.addEventListener('click', ()=>{
+      set(periodRef, {
+        status: 'ended',
+        endDate: Date.now()
+      });
+    });
+    
+    onValue(periodRef, snap=>{
+      if(snap.exists()){
+        const data = snap.val();
+        if(data.status === 'active'){
+          const days = Math.floor((Date.now() - data.startDate) / (1000 * 60 * 60 * 24));
+          statusEl.textContent = `進行中（${days}日目）`;
+        }else{
+          statusEl.textContent = '終了';
+        }
+      }
+    });
+  }else{
+    // 彼氏側：相手の状態を見る
+    document.getElementById('partnerPeriodSection').classList.remove('hidden');
+    
+    onValue(periodRef, snap=>{
+      const infoEl = document.getElementById('partnerPeriodInfo');
+      if(snap.exists()){
+        const data = snap.val();
+        if(data.status === 'active'){
+          const days = Math.floor((Date.now() - data.startDate) / (1000 * 60 * 60 * 24));
+          infoEl.innerHTML = `
+            <div class="partner-period-status">状態: 進行中（${days}日目）</div>
+            <div style="font-size:11px;color:#9ca3af;margin-top:4px;">優しく接してあげましょう</div>
+          `;
+        }else{
+          infoEl.innerHTML = '<div class="partner-period-status">状態: 終了</div>';
+        }
+      }else{
+        infoEl.innerHTML = '<div class="partner-period-status">状態: 未設定</div>';
+      }
+    });
+  }
+}
+
+// タイムカプセル
+function setupTimeCapsule(){
+  const capsuleListEl = document.getElementById('capsuleList');
+  const createBtn = document.getElementById('createCapsuleBtn');
+  const capsulesRef = ref(db, `rooms/${ROOM_ID}/capsules`);
+  
+  createBtn.addEventListener('click', ()=>{
+    const message = prompt('未来の2人へのメッセージを入力してください');
+    if(!message) return;
+    
+    const dateStr = prompt('開封日を入力してください（例: 2025-12-31）');
+    if(!dateStr) return;
+    
+    const openDate = new Date(dateStr);
+    if(isNaN(openDate.getTime())){
+      alert('正しい日付を入力してください');
+      return;
+    }
+    
+    if(openDate.getTime() <= Date.now()){
+      alert('未来の日付を入力してください');
+      return;
+    }
+    
+    push(capsulesRef, {
+      message: message,
+      from: userRole,
+      openDate: openDate.getTime(),
+      created: Date.now(),
+      opened: false
+    });
+    
+    alert('タイムカプセルを作成しました！');
+  });
+  
+  onValue(capsulesRef, snap=>{
+    capsuleListEl.innerHTML = '';
+    if(!snap.exists()){
+      capsuleListEl.innerHTML = '<div style="text-align:center;color:#9ca3af;padding:20px;font-size:13px;">まだタイムカプセルがありません</div>';
+      return;
+    }
+    
+    const capsules = [];
+    snap.forEach(child=>{
+      capsules.push({id: child.key, ...child.val()});
+    });
+    
+    capsules.sort((a,b)=> a.openDate - b.openDate);
+    
+    capsules.forEach(cap=>{
+      const now = Date.now();
+      const canOpen = now >= cap.openDate;
+      const isOpened = cap.opened;
+      
+      const div = document.createElement('div');
+      div.className = `capsule-item ${isOpened ? 'unlocked' : canOpen ? 'unlocked' : 'locked'}`;
+      
+      const fromName = cap.from === userRole ? 'あなた' : (userRole === 'boyfriend' ? '彼女' : '彼氏');
+      
+      let countdownText = '';
+      if(isOpened){
+        countdownText = '開封済み';
+      }else if(canOpen){
+        countdownText = '開封可能！';
+      }else{
+        const diff = cap.openDate - now;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        countdownText = `あと${days}日${hours}時間`;
+      }
+      
+      div.innerHTML = `
+        <div class="capsule-item-header">
+          <div class="capsule-from">${fromName}から</div>
+          <div class="capsule-countdown ${isOpened ? 'opened':''}">${countdownText}</div>
+        </div>
+        <div class="capsule-preview">${isOpened || canOpen ? cap.message : '開封日までお楽しみ...'}</div>
+        <div class="capsule-date">開封日: ${new Date(cap.openDate).toLocaleDateString('ja-JP')}</div>
+      `;
+      
+      if(canOpen && !isOpened){
+        div.addEventListener('click', ()=>{
+          if(confirm('タイムカプセルを開封しますか？')){
+            update(ref(db, `rooms/${ROOM_ID}/capsules/${cap.id}`), {opened: true});
+            
+            const partnerRole = userRole === 'boyfriend' ? '彼女' : '彼氏';
+            if(settings.notifyMessage){
+              showPush('⏳ タイムカプセル開封！', `${fromName}からのメッセージ: ${cap.message.substring(0,50)}...`);
+            }
+          }
+        });
+      }
+      
+      capsuleListEl.appendChild(div);
+    });
+  });
+}
