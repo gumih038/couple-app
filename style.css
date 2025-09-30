@@ -293,15 +293,12 @@ body{
   overflow-y:auto;
   overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
-  overscroll-behavior:contain;
   padding:20px 20px calc(80px + env(safe-area-inset-bottom));
   background:linear-gradient(180deg,#f8f9fa 0%,#ffffff 100%);
-  position:relative;
 }
 
 .screen{
   display:none;
-  min-height:100%;
 }
 .screen:not(.hidden){
   display:block;
@@ -314,25 +311,18 @@ body{
 }
 
 .anniversary-card{
-  background:linear-gradient(135deg,#fff5f5,#ffe4e6);
-  padding:20px;
-  border-radius:16px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  background:#fff;
+  padding:16px;
+  border-radius:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.05);
   display:flex;
   align-items:center;
-  gap:15px;
-  border:2px solid #fda4af;
+  gap:12px;
+  border:1px solid #e5e7eb;
 }
 
 .anniversary-icon{
-  font-size:48px;
-  animation:heartbeat 1.5s infinite;
-}
-
-@keyframes heartbeat{
-  0%,100%{transform:scale(1)}
-  25%{transform:scale(1.1)}
-  50%{transform:scale(1)}
+  font-size:28px;
 }
 
 .anniversary-info{
@@ -340,40 +330,38 @@ body{
 }
 
 .anniversary-label{
-  font-size:12px;
+  font-size:11px;
   color:#9ca3af;
-  margin-bottom:4px;
+  margin-bottom:2px;
 }
 
 .anniversary-days{
-  font-size:24px;
-  font-weight:bold;
-  color:#f43f5e;
-  margin-bottom:4px;
+  font-size:16px;
+  font-weight:600;
+  color:#667eea;
+  margin-bottom:2px;
 }
 
 .anniversary-date{
-  font-size:11px;
-  color:#6b7280;
+  font-size:10px;
+  color:#9ca3af;
 }
 
 .anniversary-set-btn{
-  padding:10px 16px;
-  background:linear-gradient(135deg,#f43f5e,#e11d48);
+  padding:8px 12px;
+  background:#667eea;
   color:#fff;
   border:none;
-  border-radius:10px;
-  font-size:13px;
+  border-radius:8px;
+  font-size:12px;
   font-weight:600;
   cursor:pointer;
-  box-shadow:0 2px 8px rgba(244,63,94,0.3);
   transition:all 0.3s;
 }
 
 .anniversary-set-btn:active{
   transform:scale(0.95);
 }
-
 /* 女の子の日（彼女側） */
 .period-section{
   margin-bottom:20px;
