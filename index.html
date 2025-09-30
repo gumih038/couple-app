@@ -6,36 +6,34 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#667eea" />
-  <title>カップル専用アプリ v2.4</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <title>カップル専用アプリ v2.5</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
     <!-- Firebase設定画面 -->
     <div id="firebaseSetup" class="firebase-setup">
-      <h2>Firebase設定</h2>
-      <span class="version-tag">v2.4</span>
+      <h2>🔧 Firebase設定</h2>
+      <span class="version-tag">v2.5</span>
       <div class="setup-info">
         <strong>初回のみ設定が必要です</strong><br />
         Firebase Consoleで取得した設定情報を入力してください。
       </div>
-      <input type="text" class="setup-input" id="apiKey" placeholder="API Key" />
-      <input type="text" class="setup-input" id="authDomain" placeholder="Auth Domain" />
-      <input type="text" class="setup-input" id="projectId" placeholder="Project ID" />
-      <input type="text" class="setup-input" id="databaseURL" placeholder="Database URL" />
-      <div id="saveConfigBtn" class="setup-btn">設定を保存</div>
+      <input type="text" class="setup-input" id="apiKey" placeholder="API Key" value="AIzaSyAGeO5vSgT0ZUkritJHa8-Zu1vkm7KoMFw" />
+      <input type="text" class="setup-input" id="authDomain" placeholder="Auth Domain" value="couple-app-b8038.firebaseapp.com" />
+      <input type="text" class="setup-input" id="projectId" placeholder="Project ID" value="couple-app-b8038" />
+      <input type="text" class="setup-input" id="databaseURL" placeholder="Database URL" value="https://couple-app-b8038-default-rtdb.asia-southeast1.firebasedatabase.app" />
+      <div id="saveConfigBtn" class="setup-btn">設定を保存 ✨</div>
     </div>
 
     <!-- 役割選択画面 -->
     <div id="roleSelect" class="role-select hidden">
-      <h1>ようこそ</h1>
-      <span class="version-tag">v2.4</span>
+      <h1>💕 ようこそ</h1>
+      <span class="version-tag">v2.5</span>
       <p style="color:#666; margin-bottom:30px;">あなたの役割を選択してください</p>
       <div class="role-buttons">
-        <div class="role-btn boyfriend" id="boyfriendBtn">彼氏</div>
-        <div class="role-btn girlfriend" id="girlfriendBtn">彼女</div>
+        <div class="role-btn boyfriend" id="boyfriendBtn">👨 彼氏</div>
+        <div class="role-btn girlfriend" id="girlfriendBtn">👩 彼女</div>
       </div>
     </div>
 
@@ -51,28 +49,17 @@
           </div>
           <div class="status-row" id="partnerStatus">
             <div class="status-dot offline"></div>
-            <span id="partnerStatusText">相手 オフライン</span>
+            <span id="partnerStatusText">相手: オフライン</span>
           </div>
         </div>
       </div>
 
       <!-- メインコンテンツ -->
       <div class="main-content">
-        <!-- 通知設定案内 -->
-        <div class="notification-guide">
-          <strong>通知の受け取り方</strong>
-          <ol>
-            <li>Safariで共有ボタンをタップ</li>
-            <li>ホーム画面に追加を選択</li>
-            <li>追加したアイコンから開く</li>
-            <li>バックグラウンドでも通知が届きます</li>
-          </ol>
-        </div>
-
         <!-- 相手の気分表示 -->
         <div class="partner-mood-display">
           <div class="partner-mood-info">
-            <div class="partner-mood-emoji" id="partnerMoodEmoji">🙂</div>
+            <div class="partner-mood-emoji" id="partnerMoodEmoji">😐</div>
             <div class="partner-mood-text">
               <div class="label" id="partnerLabel">相手の気分</div>
               <div class="status normal" id="partnerMoodStatus">普通</div>
@@ -95,17 +82,20 @@
         <div class="mood-section">
           <div class="mood-container">
             <div class="mood-label-row">
-              <div class="mood-label">あなたの気分</div>
+              <div class="mood-label">✨ あなたの気分</div>
               <div class="time-label" id="myMoodTime">未設定</div>
             </div>
             <div class="mood-buttons">
               <div class="mood-btn bad" data-mood="bad">
-                <span>あまり良くない</span>
+                😔
+                <span>あまり<br>良くない</span>
               </div>
               <div class="mood-btn normal active" data-mood="normal">
+                😐
                 <span>普通</span>
               </div>
               <div class="mood-btn good" data-mood="good">
+                😊
                 <span>嬉しい</span>
               </div>
             </div>
@@ -115,56 +105,39 @@
         <!-- ステータス選択 -->
         <div class="status-section">
           <div class="mood-label-row">
-            <div class="status-label">今のステータス</div>
+            <div class="status-label">📍 今のステータス</div>
             <div class="time-label" id="myStatusTime">未設定</div>
           </div>
           <div class="status-buttons" id="statusButtons">
-            <div class="status-btn" data-status="家">家</div>
-            <div class="status-btn" data-status="仕事中">仕事中</div>
-            <div class="status-btn" data-status="外出中">外出中</div>
-            <div class="status-btn" data-status="買い物">買い物</div>
-            <div class="status-btn" data-status="食事中">食事中</div>
-            <div class="status-btn" data-status="休憩中">休憩中</div>
+            <div class="status-btn" data-status="🏠 家">🏠 家</div>
+            <div class="status-btn" data-status="💼 仕事中">💼 仕事中</div>
+            <div class="status-btn" data-status="🚶 外出中">🚶 外出中</div>
+            <div class="status-btn" data-status="🛒 買い物">🛒 買い物</div>
+            <div class="status-btn" data-status="🍽️ 食事中">🍽️ 食事中</div>
+            <div class="status-btn" data-status="😴 休憩中">😴 休憩中</div>
           </div>
-        </div>
-
-        <!-- 緊急ボタン -->
-        <div class="emergency-section">
-          <div class="emergency-btn anxiety-btn" id="anxietyBtn">不安</div>
-          <div class="emergency-btn check-btn" id="checkBtn">大丈夫</div>
         </div>
 
         <!-- 共同ToDo -->
         <div class="todo-section">
           <div class="todo-header">
-            <div class="todo-title">ふたりのToDo</div>
+            <div class="todo-title">📝 ふたりのToDo</div>
             <div class="todo-sync-status" id="todoSyncStatus">オンライン</div>
           </div>
           <div class="todo-inputs">
             <input type="text" id="todoTitle" placeholder="やることを入力" />
             <input type="datetime-local" id="todoDue" />
-            <button id="addTodoBtn">追加</button>
+            <button id="addTodoBtn">✨ 追加</button>
           </div>
           <ul id="todoList" class="todo-list" aria-live="polite"></ul>
         </div>
 
-        <!-- 定型文 -->
-        <div class="quick-section">
-          <div class="chat-label">定型文</div>
-          <div class="quick-row" id="quickRow">
-            <button class="quick-btn">今大丈夫です</button>
-            <button class="quick-btn">あとで電話します</button>
-            <button class="quick-btn">帰宅中です</button>
-            <button class="quick-btn">ありがとう</button>
-          </div>
-        </div>
-
         <!-- チャット -->
         <div class="chat-section">
-          <div class="chat-label">メッセージ</div>
+          <div class="chat-label">💬 メッセージ</div>
           <div class="chat-messages" id="chatMessages"></div>
           <div class="chat-input-section">
-            <input type="text" class="chat-input" id="chatInput" placeholder="メッセージを入力" />
+            <input type="text" class="chat-input" id="chatInput" placeholder="メッセージを入力..." />
             <button class="send-btn" id="sendBtn">送信</button>
           </div>
           <div class="read-tip" id="readTip">既読が付きます</div>
@@ -174,12 +147,5 @@
   </div>
 
   <script type="module" src="app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js');
-      });
-    }
-  </script>
 </body>
 </html>
