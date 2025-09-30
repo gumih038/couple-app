@@ -1,8 +1,7 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, set, onValue, push, remove, onDisconnect, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
-import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-let db, storage;
+let db;
 const ROOM_ID = 'couple_room_001';
 let userRole = '';
 let isPartnerOnline = false;
@@ -17,8 +16,7 @@ let settings = {
   animateMessages: true,
   showRead: true,
   showTyping: true,
-  autoDelete: true,
-  compressImage: true
+  autoDelete: true
 };
 
 // 通知権限
@@ -80,7 +78,6 @@ function connectFirebase(config){
   try{
     const app = initializeApp(config);
     db = getDatabase(app);
-    storage = getStorage(app);
 
     document.getElementById('firebaseSetup').classList.add('hidden');
     document.getElementById('roleSelect').classList.remove('hidden');
@@ -225,7 +222,6 @@ function setupChat(){
   const sendBtn = document.getElementById('sendBtn');
   const listEl = document.getElementById('chatMessages');
   const msgsRef = ref(db, `rooms/${ROOM_ID}/messages`);
-  const imageInput = document.getElementById('imageInput');
 
   const send = ()=>{
     const text = input.value.trim();
@@ -259,49 +255,6 @@ function setupChat(){
     }
   });
 
-  // 画像送信
-  imageInput.addEventListener('change', async (e)=>{
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    if (!file.type.startsWith('image/')){
-      alert('画像ファイルを選択してください');
-      return;
-    }
-    
-    if (file.size > 5 * 1024 * 1024){
-      alert('画像は5MB以下にしてください');
-      return;
-    }
-
-    try {
-      let uploadFile = file;
-      
-      // 画像圧縮
-      if (settings.compressImage && file.size > 500 * 1024){
-        uploadFile = await compressImage(file);
-      }
-      
-      const filename = `${ROOM_ID}/${Date.now()}_${file.name}`;
-      const imgRef = storageRef(storage, filename);
-      await uploadBytes(imgRef, uploadFile);
-      const url = await getDownloadURL(imgRef);
-      
-      const msgRef = push(msgsRef);
-      set(msgRef, {
-        type:'image',
-        from: userRole,
-        imageUrl: url,
-        ts: Date.now(),
-        readBy: { [userRole]: Date.now() }
-      });
-      
-      imageInput.value = '';
-    } catch (error) {
-      alert('画像の送信に失敗しました: ' + error.message);
-    }
-  });
-
   onValue(msgsRef, snap=>{
     listEl.innerHTML = '';
     const data = snap.val() || {};
@@ -314,26 +267,6 @@ function setupChat(){
       if (m.type === 'system'){
         div.className = 'message system';
         div.innerHTML = `<div class="message-content">${escapeHTML(m.text)}</div><div class="message-time">${formatTime(m.ts)}</div>`;
-      }else if(m.type === 'image'){
-        const isYou = m.from === userRole;
-        div.className = `message ${isYou ? 'you':'partner'}`;
-        const read = settings.showRead && m.readBy && m.readBy[partnerRole] ? ' ✓' : '';
-        div.innerHTML = `
-          <div class="message-content">
-            <img src="${m.imageUrl}" class="message-image" onclick="window.open('${m.imageUrl}')" />
-          </div>
-          <div class="message-time">${formatTime(m.ts)}${read}</div>
-        `;
-        
-        if (!isYou && (!m.readBy || !m.readBy[userRole])){
-          const patch = {};
-          patch[`rooms/${ROOM_ID}/messages/${id}/readBy/${userRole}`] = Date.now();
-          update(ref(db), patch);
-          
-          if(settings.notifyMessage){
-            showPush('📷 新しい写真', '相手が写真を送りました');
-          }
-        }
       }else{
         const isYou = m.from === userRole;
         div.className = `message ${isYou ? 'you':'partner'}`;
@@ -366,41 +299,6 @@ function setupChat(){
         }
       });
     }
-  });
-}
-
-// 画像圧縮
-async function compressImage(file){
-  return new Promise((resolve)=>{
-    const reader = new FileReader();
-    reader.onload = (e)=>{
-      const img = new Image();
-      img.onload = ()=>{
-        const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        const maxSize = 1200;
-        
-        if(width > height && width > maxSize){
-          height = (height / width) * maxSize;
-          width = maxSize;
-        }else if(height > maxSize){
-          width = (width / height) * maxSize;
-          height = maxSize;
-        }
-        
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        canvas.toBlob((blob)=>{
-          resolve(new File([blob], file.name, {type: 'image/jpeg'}));
-        }, 'image/jpeg', 0.8);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
   });
 }
 
