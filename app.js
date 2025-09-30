@@ -1,5 +1,5 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getDatabase, ref, set, onValue, push, remove, onDisconnect, update, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getDatabase, ref, set, onValue, push, remove, onDisconnect, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
 let db;
 const ROOM_ID = 'couple_room_001';
@@ -11,6 +11,7 @@ let hasShownOnlineNotification = false;
 if ('Notification' in window && Notification.permission === 'default') {
   Notification.requestPermission();
 }
+
 function showPush(title, body){
   if ('Notification' in window && Notification.permission === 'granted'){
     const n = new Notification(title,{ body, tag:'couple-app' });
@@ -27,7 +28,6 @@ if (document.readyState === 'loading'){
 }
 
 function bootstrap(){
-  // 既存設定ロード
   const cfgStr = localStorage.getItem('firebaseConfig');
   if (cfgStr){
     try{
@@ -36,6 +36,7 @@ function bootstrap(){
       localStorage.removeItem('firebaseConfig');
     }
   }
+  
   const saveBtn = document.getElementById('saveConfigBtn');
   if (saveBtn){
     const handleSave = (e)=>{
@@ -71,15 +72,17 @@ function connectFirebase(config){
       localStorage.setItem('userRole', role);
       document.getElementById('roleSelect').classList.add('hidden');
       document.getElementById('mainApp').classList.remove('hidden');
+      
       const header = document.getElementById('header');
       const headerTitle = document.getElementById('headerTitle');
+      
       if (role === 'boyfriend'){
         header.className = 'header boyfriend';
-        headerTitle.textContent = '彼氏モード';
+        headerTitle.textContent = '👨 彼氏モード';
         document.getElementById('partnerLabel').textContent = '彼女の気分';
       }else{
         header.className = 'header girlfriend';
-        headerTitle.textContent = '彼女モード';
+        headerTitle.textContent = '👩 彼女モード';
         document.getElementById('partnerLabel').textContent = '彼氏の気分';
       }
       initApp();
@@ -103,15 +106,13 @@ function initApp(){
   setupPresence();
   setupMoodButtons();
   setupStatusButtons();
-  setupEmergency();
   setupChat();
-  setupQuickPhrases();
   setupTyping();
   setupTodos();
   subscribePartnerState();
 }
 
-/* Presence */
+// Presence
 function setupPresence(){
   const myRef = ref(db, `rooms/${ROOM_ID}/presence/${userRole}`);
   const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
@@ -120,20 +121,28 @@ function setupPresence(){
   set(myRef, { online:true, ts: Date.now() });
   onDisconnect(myRef).set({ online:false, ts: Date.now() });
 
+  setInterval(() => {
+    set(myRef, { online:true, ts: Date.now() });
+  }, 30000);
+
   onValue(partnerRef, snap=>{
     const v = snap.val();
-    const online = v && v.online;
+    const online = v && v.online && (Date.now() - v.ts < 60000);
+    const wasOnline = isPartnerOnline;
     isPartnerOnline = !!online;
+    
     document.querySelector('#partnerStatus .status-dot').classList.toggle('offline', !online);
-    document.getElementById('partnerStatusText').textContent = online ? '相手 オンライン' : '相手 オフライン';
-    if (online && !hasShownOnlineNotification){
-      showPush('相手がオンラインになりました', '今ならすぐに返信が届きます');
-      hasShownOnlineNotification = true;
+    document.querySelector('#partnerStatus .status-dot').classList.toggle('online', online);
+    document.getElementById('partnerStatusText').textContent = online ? '相手: オンライン' : '相手: オフライン';
+    
+    if (online && !wasOnline && hasShownOnlineNotification){
+      showPush('💚 相手がオンラインになりました', '今ならすぐに返信が届きます');
     }
+    hasShownOnlineNotification = true;
   });
 }
 
-/* Mood */
+// Mood
 function setupMoodButtons(){
   const buttons = document.querySelectorAll('.mood-btn');
   const myMoodRef = ref(db, `rooms/${ROOM_ID}/mood/${userRole}`);
@@ -152,7 +161,7 @@ function setupMoodButtons(){
   });
 }
 
-/* Status */
+// Status
 function setupStatusButtons(){
   const btns = document.querySelectorAll('.status-btn');
   const myStatusRef = ref(db, `rooms/${ROOM_ID}/status/${userRole}`);
@@ -170,26 +179,7 @@ function setupStatusButtons(){
   });
 }
 
-/* Emergency */
-function setupEmergency(){
-  const anxietyBtn = document.getElementById('anxietyBtn');
-  const checkBtn = document.getElementById('checkBtn');
-  const sysRef = ref(db, `rooms/${ROOM_ID}/system`);
-
-  const send = (type)=>{
-    push(ref(db, `rooms/${ROOM_ID}/messages`), {
-      type:'system', text: type === 'anxiety' ? '不安通知' : '確認通知', ts: Date.now()
-    });
-    set(sysRef, { last: type, from: userRole, ts: Date.now() });
-    showPush('通知を送信しました', '相手に届きます');
-  };
-  anxietyBtn.addEventListener('click', ()=>send('anxiety'));
-  checkBtn.addEventListener('click', ()=>send('check'));
-  anxietyBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); send('anxiety'); }, {passive:false});
-  checkBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); send('check'); }, {passive:false});
-}
-
-/* Chat */
+// Chat
 function setupChat(){
   const input = document.getElementById('chatInput');
   const sendBtn = document.getElementById('sendBtn');
@@ -213,6 +203,13 @@ function setupChat(){
 
   sendBtn.addEventListener('click', send);
   sendBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); send(); }, {passive:false});
+  
+  input.addEventListener('keypress', (e)=>{
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      send();
+    }
+  });
 
   input.addEventListener('input', ()=>{
     setTyping(true);
@@ -233,17 +230,18 @@ function setupChat(){
       }else{
         const isYou = m.from === userRole;
         div.className = `message ${isYou ? 'you':'partner'}`;
-        const read = m.readBy && m.readBy[partnerRole] ? '既読' : '';
+        const read = m.readBy && m.readBy[partnerRole] ? ' ✓' : '';
         div.innerHTML = `
           <div class="message-content">${linkify(escapeHTML(m.text))}</div>
-          <div class="message-time">${formatTime(m.ts)} ${read}
-          </div>
+          <div class="message-time">${formatTime(m.ts)}${read}</div>
         `;
-        // 既読付与
-        if (!isYou){
+        
+        if (!isYou && (!m.readBy || !m.readBy[userRole])){
           const patch = {};
           patch[`rooms/${ROOM_ID}/messages/${id}/readBy/${userRole}`] = Date.now();
           update(ref(db), patch);
+          
+          showPush('💬 新しいメッセージ', m.text);
         }
       }
       listEl.appendChild(div);
@@ -252,25 +250,28 @@ function setupChat(){
   });
 }
 
-/* Typing indicator */
+// Typing indicator
 let typingTimer = null;
+
 function setupTyping(){
   const partnerRole = userRole === 'boyfriend' ? 'girlfriend':'boyfriend';
   const partnerTypingRef = ref(db, `rooms/${ROOM_ID}/typing/${partnerRole}`);
   onValue(partnerTypingRef, snap=>{
     const v = !!snap.val();
-    document.getElementById('typingIndicator').textContent = v ? '相手が入力中です' : '';
+    document.getElementById('typingIndicator').textContent = v ? '✏️ 入力中...' : '';
   });
 }
+
 function setTyping(v){
   set(ref(db, `rooms/${ROOM_ID}/typing/${userRole}`), v);
 }
+
 function scheduleTypingOff(){
   if (typingTimer) clearTimeout(typingTimer);
   typingTimer = setTimeout(()=> setTyping(false), 1200);
 }
 
-/* Todos */
+// Todos
 function setupTodos(){
   const addBtn = document.getElementById('addTodoBtn');
   const titleEl = document.getElementById('todoTitle');
@@ -281,14 +282,16 @@ function setupTodos(){
 
   function render(list){
     listEl.innerHTML = '';
-    Object.entries(list).sort((a,b)=> (a[1].done||0) - (b[1].done||0) || (a[1].due||Infinity) - (b[1].due||Infinity))
+    Object.entries(list)
+      .sort((a,b)=> (a[1].done||0) - (b[1].done||0) || (a[1].due||Infinity) - (b[1].due||Infinity))
       .forEach(([id,t])=>{
         const li = document.createElement('li');
         li.className = 'todo-item';
+        const dueText = t.due ? new Date(t.due).toLocaleString('ja-JP', {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
         li.innerHTML = `
           <input type="checkbox" ${t.done?'checked':''} aria-label="完了" />
           <div class="title">${escapeHTML(t.title || '')}</div>
-          <div class="due">${t.due ? formatTime(t.due) : ''}</div>
+          <div class="due">${dueText}</div>
           <button class="remove">削除</button>
         `;
         const [chk, , , rm] = li.children;
@@ -301,7 +304,13 @@ function setupTodos(){
   addBtn.addEventListener('click', ()=>{
     const title = titleEl.value.trim();
     if (!title) return;
-    push(todosRef, { title, due: dueEl.value ? new Date(dueEl.value).getTime() : null, createdBy: userRole, ts: Date.now(), done: null });
+    push(todosRef, { 
+      title, 
+      due: dueEl.value ? new Date(dueEl.value).getTime() : null, 
+      createdBy: userRole, 
+      ts: Date.now(), 
+      done: null 
+    });
     titleEl.value = '';
     dueEl.value = '';
   });
@@ -310,69 +319,104 @@ function setupTodos(){
     render(snap.val() || {});
   });
 
-  // オンライン表示
   window.addEventListener('online', ()=> syncEl.textContent = 'オンライン');
   window.addEventListener('offline', ()=> syncEl.textContent = 'オフライン');
   syncEl.textContent = navigator.onLine ? 'オンライン':'オフライン';
 }
 
-/* Partner state subscription */
+// Partner state subscription
 function subscribePartnerState(){
   const partnerRole = userRole === 'boyfriend' ? 'girlfriend':'boyfriend';
   const moodRef = ref(db, `rooms/${ROOM_ID}/mood/${partnerRole}`);
   const statusRef = ref(db, `rooms/${ROOM_ID}/status/${partnerRole}`);
+  
+  let lastMood = '';
+  let lastStatus = '';
 
   onValue(moodRef, snap=>{
     const v = snap.val();
     if (!v) return;
-    const emoji = v.mood === 'good' ? '😄' : v.mood === 'bad' ? '😢' : '🙂';
+    
+    const emoji = v.mood === 'good' ? '😊' : v.mood === 'bad' ? '😔' : '😐';
     const label = v.mood === 'good' ? '嬉しい' : v.mood === 'bad' ? 'あまり良くない' : '普通';
+    
     document.getElementById('partnerMoodEmoji').textContent = emoji;
     const s = document.getElementById('partnerMoodStatus');
     s.textContent = label;
     s.classList.remove('good','normal','bad');
     s.classList.add(v.mood);
-    document.getElementById('partnerMoodTime').textContent = formatTime(v.ts);
+    document.getElementById('partnerMoodTime').textContent = formatTimeRelative(v.ts);
+    
+    if (lastMood && lastMood !== v.mood){
+      if (v.mood === 'bad'){
+        showPush('😔 気分の変化', `相手の気分があまり良くないようです`);
+      }
+    }
+    lastMood = v.mood;
   });
 
   onValue(statusRef, snap=>{
     const v = snap.val();
     if (!v) return;
-    document.getElementById('partnerCurrentStatus').textContent = v.text || '未設定';
-    document.getElementById('partnerStatusTime').textContent = formatTime(v.ts);
+    
+    document.getElementById('partnerCurrentStatus').textContent = v.text || 'ステータス未設定';
+    document.getElementById('partnerStatusTime').textContent = formatTimeRelative(v.ts);
+    
+    if (lastStatus && lastStatus !== v.text){
+      showPush('📍 ステータス更新', v.text);
+    }
+    lastStatus = v.text;
   });
+  
+  setInterval(() => {
+    onValue(moodRef, snap=>{
+      const v = snap.val();
+      if (v) document.getElementById('partnerMoodTime').textContent = formatTimeRelative(v.ts);
+    }, { onlyOnce: true });
+    
+    onValue(statusRef, snap=>{
+      const v = snap.val();
+      if (v) document.getElementById('partnerStatusTime').textContent = formatTimeRelative(v.ts);
+    }, { onlyOnce: true });
+  }, 60000);
 }
 
-/* Quick phrases */
-function setupQuickPhrases(){
-  const row = document.getElementById('quickRow');
-  const input = document.getElementById('chatInput');
-  row.addEventListener('click', (e)=>{
-    const btn = e.target.closest('.quick-btn');
-    if (!btn) return;
-    input.value = btn.textContent.trim();
-    input.focus();
-    setTyping(true);
-    scheduleTypingOff();
-  });
-}
-
-/* Util */
+// Util
 function formatTime(ts){
   try{
     const d = new Date(ts);
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,'0');
-    const day = String(d.getDate()).padStart(2,'0');
     const hh = String(d.getHours()).padStart(2,'0');
     const mm = String(d.getMinutes()).padStart(2,'0');
-    return `${y}/${m}/${day} ${hh}:${mm}`;
+    return `${hh}:${mm}`;
   }catch{
     return '';
   }
 }
-function escapeHTML(s){ return s.replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+function formatTimeRelative(ts){
+  const now = Date.now();
+  const diff = now - ts;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  
+  if (minutes < 1) return '今';
+  if (minutes < 60) return `${minutes}分前`;
+  if (hours < 24) return `${hours}時間前`;
+  return `${days}日前`;
+}
+
+function escapeHTML(s){ 
+  return s.replace(/[&<>"']/g, c=>({ 
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#39;' 
+  }[c])); 
+}
+
 function linkify(text){
   const urlRe = /(https?:\/\/[^\s]+)/g;
-  return text.replace(urlRe, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  return text.replace(urlRe, '<a href="$1" target="_blank" rel="noopener" style="color:#667eea;text-decoration:underline">$1</a>');
 }
