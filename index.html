@@ -4,9 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>カップル専用アプリ</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -21,6 +26,7 @@
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
+        
         .role-select {
             padding: 40px 20px;
             text-align: center;
@@ -52,7 +58,10 @@
         .role-btn.girlfriend {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
-        .role-btn:active { transform: scale(0.95); }
+        .role-btn:active {
+            transform: scale(0.95);
+        }
+
         .header {
             padding: 15px 20px;
             display: flex;
@@ -66,7 +75,10 @@
         .header.girlfriend {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
-        .header h2 { color: white; font-size: 20px; }
+        .header h2 {
+            color: white;
+            font-size: 20px;
+        }
         .connection-status {
             display: flex;
             align-items: center;
@@ -85,7 +97,11 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
-        .mood-section { padding: 20px; background: #f8f9fa; }
+
+        .mood-section {
+            padding: 20px;
+            background: #f8f9fa;
+        }
         .mood-container {
             background: white;
             padding: 15px;
@@ -100,7 +116,10 @@
             justify-content: space-between;
             align-items: center;
         }
-        .mood-time { font-size: 12px; color: #999; }
+        .mood-time {
+            font-size: 12px;
+            color: #999;
+        }
         .mood-slider {
             width: 100%;
             height: 40px;
@@ -125,7 +144,11 @@
             margin-top: 10px;
             color: #667eea;
         }
-        .status-section { padding: 0 20px 20px 20px; background: #f8f9fa; }
+
+        .status-section {
+            padding: 0 20px 20px 20px;
+            background: #f8f9fa;
+        }
         .status-input {
             width: 100%;
             padding: 12px;
@@ -134,8 +157,16 @@
             font-size: 14px;
             transition: border 0.3s;
         }
-        .status-input:focus { outline: none; border-color: #667eea; }
-        .emergency-section { padding: 20px; display: flex; gap: 10px; }
+        .status-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .emergency-section {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+        }
         .emergency-btn {
             flex: 1;
             padding: 15px;
@@ -153,7 +184,10 @@
         .check-btn {
             background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
         }
-        .emergency-btn:active { transform: scale(0.95); }
+        .emergency-btn:active {
+            transform: scale(0.95);
+        }
+
         .chat-section {
             height: 400px;
             overflow-y: auto;
@@ -166,8 +200,14 @@
             clear: both;
         }
         @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         .message-content {
             display: inline-block;
@@ -187,14 +227,21 @@
             border-bottom-right-radius: 5px;
             float: right;
         }
-        .message.system { text-align: center; }
+        .message.system {
+            text-align: center;
+        }
         .message.system .message-content {
             background: #fef3c7;
             color: #92400e;
             font-size: 13px;
             border-radius: 20px;
         }
-        .message-time { font-size: 11px; color: #999; margin-top: 5px; }
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+        }
+
         .input-section {
             padding: 15px;
             border-top: 1px solid #eee;
@@ -209,7 +256,10 @@
             border-radius: 20px;
             font-size: 14px;
         }
-        .chat-input:focus { outline: none; border-color: #667eea; }
+        .chat-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
         .send-btn {
             padding: 10px 20px;
             background: #667eea;
@@ -219,10 +269,21 @@
             cursor: pointer;
             font-weight: bold;
         }
-        .send-btn:active { background: #4c63d2; }
-        .hidden { display: none; }
-        .firebase-setup { padding: 30px 20px; }
-        .firebase-setup h2 { color: #667eea; margin-bottom: 20px; }
+        .send-btn:active {
+            background: #4c63d2;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .firebase-setup {
+            padding: 30px 20px;
+        }
+        .firebase-setup h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
         .setup-input {
             width: 100%;
             padding: 12px;
@@ -242,7 +303,9 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .setup-btn:active { transform: scale(0.98); }
+        .setup-btn:active {
+            transform: scale(0.98);
+        }
         .setup-info {
             background: #fef3c7;
             padding: 15px;
@@ -267,6 +330,7 @@
             <input type="text" class="setup-input" id="databaseURL" placeholder="Database URL">
             <button class="setup-btn" id="saveConfigBtn">設定を保存</button>
         </div>
+
         <div id="roleSelect" class="role-select hidden">
             <h1>💕 ようこそ</h1>
             <p style="color: #666; margin-bottom: 30px;">あなたの役割を選択してください</p>
@@ -275,6 +339,7 @@
                 <button class="role-btn girlfriend" id="girlfriendBtn">👩 彼女</button>
             </div>
         </div>
+
         <div id="mainApp" class="hidden">
             <div class="header" id="header">
                 <h2 id="headerTitle"></h2>
@@ -283,6 +348,7 @@
                     <span>接続中</span>
                 </div>
             </div>
+
             <div class="mood-section">
                 <div class="mood-container">
                     <div class="mood-label">
@@ -301,45 +367,58 @@
                     <div class="mood-value" id="partnerMoodValue">5 / 10</div>
                 </div>
             </div>
+
             <div class="status-section">
                 <input type="text" class="status-input" id="statusInput" placeholder="今どこで何してる？（例：家でゆっくり中）">
             </div>
+
             <div class="emergency-section">
                 <button class="emergency-btn anxiety-btn" id="anxietyBtn">😰 不安</button>
                 <button class="emergency-btn check-btn" id="checkBtn">💚 大丈夫？</button>
             </div>
+
             <div class="chat-section" id="chatArea"></div>
+
             <div class="input-section">
                 <input type="text" class="chat-input" id="chatInput" placeholder="メッセージを入力...">
                 <button class="send-btn" id="sendBtn">送信</button>
             </div>
         </div>
     </div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-        let db, userRole = '';
+        let db;
+        let userRole = '';
         const ROOM_ID = 'couple_room_001';
 
-        window.addEventListener('load', () => initFirebase());
+        window.addEventListener('load', function() {
+            initFirebase();
+        });
 
         function initFirebase() {
-            document.getElementById('saveConfigBtn').onclick = () => {
-                const config = {
-                    apiKey: document.getElementById('apiKey').value.trim(),
-                    authDomain: document.getElementById('authDomain').value.trim(),
-                    projectId: document.getElementById('projectId').value.trim(),
-                    databaseURL: document.getElementById('databaseURL').value.trim()
+            const saveBtn = document.getElementById('saveConfigBtn');
+            if (saveBtn) {
+                saveBtn.onclick = function() {
+                    const config = {
+                        apiKey: document.getElementById('apiKey').value.trim(),
+                        authDomain: document.getElementById('authDomain').value.trim(),
+                        projectId: document.getElementById('projectId').value.trim(),
+                        databaseURL: document.getElementById('databaseURL').value.trim()
+                    };
+
+                    if (!config.apiKey || !config.authDomain || !config.projectId || !config.databaseURL) {
+                        alert('すべての項目を入力してください');
+                        return;
+                    }
+
+                    localStorage.setItem('firebaseConfig', JSON.stringify(config));
+                    alert('設定を保存しました！');
+                    location.reload();
                 };
-                if (!config.apiKey || !config.authDomain || !config.projectId || !config.databaseURL) {
-                    alert('すべての項目を入力してください');
-                    return;
-                }
-                localStorage.setItem('firebaseConfig', JSON.stringify(config));
-                alert('設定を保存しました！');
-                location.reload();
-            };
+            }
 
             const configStr = localStorage.getItem('firebaseConfig');
             if (!configStr) {
@@ -351,12 +430,17 @@
                 const config = JSON.parse(configStr);
                 const app = initializeApp(config);
                 db = getDatabase(app);
+                
                 document.getElementById('firebaseSetup').classList.add('hidden');
                 document.getElementById('roleSelect').classList.remove('hidden');
+                
                 document.getElementById('boyfriendBtn').onclick = () => selectRole('boyfriend');
                 document.getElementById('girlfriendBtn').onclick = () => selectRole('girlfriend');
+                
                 const savedRole = localStorage.getItem('userRole');
-                if (savedRole) selectRole(savedRole);
+                if (savedRole) {
+                    selectRole(savedRole);
+                }
             } catch (error) {
                 alert('Firebase接続エラー: ' + error.message);
                 localStorage.removeItem('firebaseConfig');
@@ -366,10 +450,13 @@
         function selectRole(role) {
             userRole = role;
             localStorage.setItem('userRole', role);
+            
             document.getElementById('roleSelect').classList.add('hidden');
             document.getElementById('mainApp').classList.remove('hidden');
+            
             const header = document.getElementById('header');
             const headerTitle = document.getElementById('headerTitle');
+            
             if (role === 'boyfriend') {
                 header.className = 'header boyfriend';
                 headerTitle.textContent = '👨 彼氏モード';
@@ -379,6 +466,7 @@
                 headerTitle.textContent = '👩 彼女モード';
                 document.getElementById('partnerName').textContent = '彼氏';
             }
+            
             initApp();
         }
 
@@ -388,8 +476,11 @@
             loadMessages();
             startMoodTimer();
             cleanOldMessages();
+            
             document.getElementById('sendBtn').onclick = sendMessage;
-            document.getElementById('chatInput').onkeypress = (e) => { if (e.key === 'Enter') sendMessage(); };
+            document.getElementById('chatInput').onkeypress = function(e) {
+                if (e.key === 'Enter') sendMessage();
+            };
             document.getElementById('anxietyBtn').onclick = sendAnxiety;
             document.getElementById('checkBtn').onclick = sendCheck;
         }
@@ -397,10 +488,12 @@
         function setupMoodSlider() {
             const myMood = document.getElementById('myMood');
             const myMoodValue = document.getElementById('myMoodValue');
+            
             myMood.oninput = function() {
                 myMoodValue.textContent = this.value + ' / 10';
                 saveMood(this.value);
             };
+
             const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
             onValue(ref(db, `${ROOM_ID}/mood/${partnerRole}`), (snapshot) => {
                 if (snapshot.exists()) {
@@ -421,12 +514,13 @@
         }
 
         function startMoodTimer() {
+            const TWO_HOURS = 2 * 60 * 60 * 1000;
             setInterval(() => {
                 const moodRef = ref(db, `${ROOM_ID}/mood/${userRole}`);
                 onValue(moodRef, (snapshot) => {
                     if (snapshot.exists()) {
                         const data = snapshot.val();
-                        if (Date.now() - data.timestamp > 7200000) {
+                        if (Date.now() - data.timestamp > TWO_HOURS) {
                             document.getElementById('myMood').value = 5;
                             document.getElementById('myMoodValue').textContent = '5 / 10';
                             saveMood(5);
@@ -444,6 +538,7 @@
                     timestamp: Date.now()
                 });
             };
+
             const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
             onValue(ref(db, `${ROOM_ID}/status/${partnerRole}`), (snapshot) => {
                 if (snapshot.exists()) {
@@ -504,12 +599,15 @@
             const chatArea = document.getElementById('chatArea');
             const div = document.createElement('div');
             div.className = msg.type === 'system' ? 'message system' : `message ${msg.sender}`;
+            
             const content = document.createElement('div');
             content.className = 'message-content';
             content.textContent = msg.text;
+            
             const time = document.createElement('div');
             time.className = 'message-time';
             time.textContent = formatTime(msg.timestamp);
+            
             div.appendChild(content);
             div.appendChild(time);
             chatArea.appendChild(div);
@@ -525,4 +623,26 @@
 
         function cleanOldMessages() {
             setInterval(() => {
-                cons
+                const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
+                onValue(ref(db, `${ROOM_ID}/messages`), (snapshot) => {
+                    if (snapshot.exists()) {
+                        snapshot.forEach((child) => {
+                            const msg = child.val();
+                            if (msg.timestamp < oneDayAgo) {
+                                remove(ref(db, `${ROOM_ID}/messages/${child.key}`));
+                            }
+                        });
+                    }
+                }, { onlyOnce: true });
+            }, 60000);
+        }
+
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+    </script>
+</body>
+</html>
