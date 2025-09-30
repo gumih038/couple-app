@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>カップル専用アプリ v2.0</title>
+    <title>カップル専用アプリ v2.1</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -21,7 +21,6 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            position: relative;
         }
         
         /* Firebase設定画面 */
@@ -164,62 +163,131 @@
             50% { opacity: 0.5; }
         }
 
-        /* メインコンテンツエリア */
+        /* メインコンテンツ */
         .main-content {
             flex: 1;
             overflow-y: auto;
+            padding: 20px;
             background: #f8f9fa;
         }
 
-        /* ホーム画面 */
-        .home-screen {
-            padding: 20px;
-        }
+        /* 気分セクション */
         .mood-section {
             margin-bottom: 20px;
         }
         .mood-container {
             background: white;
-            padding: 15px;
+            padding: 20px;
             border-radius: 15px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         .mood-label {
             font-size: 14px;
             color: #666;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        .mood-buttons {
             display: flex;
+            gap: 10px;
             justify-content: space-between;
-            align-items: center;
         }
-        .mood-time { 
-            font-size: 12px; 
-            color: #999; 
-        }
-        .mood-slider {
-            width: 100%;
-            height: 40px;
-            -webkit-appearance: none;
-            background: linear-gradient(to right, #ef4444 0%, #f59e0b 50%, #10b981 100%);
-            border-radius: 20px;
-            outline: none;
-        }
-        .mood-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 30px;
-            height: 30px;
+        .mood-btn {
+            flex: 1;
+            padding: 15px;
+            border: 3px solid #e5e7eb;
+            border-radius: 15px;
             background: white;
-            border-radius: 50%;
+            font-size: 28px;
             cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            -webkit-tap-highlight-color: transparent;
         }
-        .mood-value {
-            text-align: center;
-            font-size: 24px;
+        .mood-btn span {
+            font-size: 11px;
+            color: #666;
+            font-weight: 600;
+        }
+        .mood-btn:active {
+            transform: scale(0.95);
+        }
+        .mood-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .mood-btn.bad.active {
+            border-color: #ef4444;
+            background: #fef2f2;
+        }
+        .mood-btn.normal.active {
+            border-color: #f59e0b;
+            background: #fffbeb;
+        }
+        .mood-btn.good.active {
+            border-color: #10b981;
+            background: #f0fdf4;
+        }
+
+        /* 相手の気分表示 */
+        .partner-mood-display {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .partner-mood-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .partner-mood-emoji {
+            font-size: 48px;
+        }
+        .partner-mood-text {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .partner-mood-text .label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
+        }
+        .partner-mood-text .status {
+            font-size: 18px;
             font-weight: bold;
-            margin-top: 10px;
-            color: #667eea;
+        }
+        .partner-mood-text .status.bad { color: #ef4444; }
+        .partner-mood-text .status.normal { color: #f59e0b; }
+        .partner-mood-text .status.good { color: #10b981; }
+
+        /* 相手のステータス表示 */
+        .partner-status-display {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .partner-status-display .icon {
+            font-size: 24px;
+        }
+        .partner-status-display .text {
+            font-size: 14px;
+            color: #666;
+            font-weight: 600;
         }
 
         /* ステータスボタン */
@@ -287,19 +355,30 @@
             transform: scale(0.95); 
         }
 
-        /* チャット画面 */
-        .chat-screen {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+        /* チャットセクション（小さく） */
+        .chat-section {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .chat-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
         }
         .chat-messages {
-            flex: 1;
+            max-height: 150px;
             overflow-y: auto;
-            padding: 20px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
         }
         .message {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             animation: slideIn 0.3s;
             clear: both;
         }
@@ -309,11 +388,11 @@
         }
         .message-content {
             display: inline-block;
-            padding: 12px 16px;
-            border-radius: 18px;
+            padding: 8px 12px;
+            border-radius: 12px;
             max-width: 70%;
             word-wrap: break-word;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 13px;
         }
         .message.boyfriend .message-content {
             background: #667eea;
@@ -332,111 +411,46 @@
         .message.system .message-content {
             background: #fef3c7;
             color: #92400e;
-            font-size: 13px;
-            border-radius: 20px;
+            font-size: 11px;
+            border-radius: 15px;
         }
         .message-time {
-            font-size: 11px;
+            font-size: 10px;
             color: #999;
-            margin-top: 5px;
+            margin-top: 3px;
         }
         .chat-input-section {
-            padding: 15px;
-            background: white;
-            border-top: 1px solid #e5e7eb;
             display: flex;
-            gap: 10px;
-            flex-shrink: 0;
+            gap: 8px;
         }
         .chat-input {
             flex: 1;
-            padding: 12px 16px;
+            padding: 10px 12px;
             border: 2px solid #e5e7eb;
-            border-radius: 25px;
-            font-size: 14px;
+            border-radius: 20px;
+            font-size: 13px;
             outline: none;
         }
         .chat-input:focus {
             border-color: #667eea;
         }
         .send-btn {
-            padding: 12px 24px;
+            padding: 10px 20px;
             background: #667eea;
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 13px;
             -webkit-tap-highlight-color: transparent;
         }
         .send-btn:active {
             background: #4c63d2;
         }
 
-        /* 通知 */
-        .notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            padding: 15px 25px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 1000;
-            animation: notificationSlide 0.3s;
-            max-width: 90%;
-        }
-        @keyframes notificationSlide {
-            from {
-                opacity: 0;
-                transform: translateX(-50%) translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(-50%) translateY(0);
-            }
-        }
-
-        /* タブナビゲーション */
-        .tab-navigation {
-            display: flex;
-            background: white;
-            border-top: 1px solid #e5e7eb;
-            flex-shrink: 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-        }
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
-            color: #9ca3af;
-            font-size: 11px;
-            transition: color 0.2s;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .tab-btn.active {
-            color: #667eea;
-        }
-        .tab-icon {
-            font-size: 22px;
-        }
-
         .hidden { 
             display: none; 
-        }
-        
-        .screen {
-            display: none;
-        }
-        .screen.active {
-            display: block;
         }
     </style>
 </head>
@@ -445,7 +459,7 @@
         <!-- Firebase設定画面 -->
         <div id="firebaseSetup" class="firebase-setup">
             <h2>🔧 Firebase設定</h2>
-            <span class="version-tag">v2.0</span>
+            <span class="version-tag">v2.1</span>
             <div class="setup-info">
                 <strong>初回のみ設定が必要です</strong><br>
                 Firebase Consoleで取得した設定情報を入力してください。
@@ -460,7 +474,7 @@
         <!-- 役割選択画面 -->
         <div id="roleSelect" class="role-select hidden">
             <h1>💕 ようこそ</h1>
-            <span class="version-tag">v2.0</span>
+            <span class="version-tag">v2.1</span>
             <p style="color: #666; margin-bottom: 30px;">あなたの役割を選択してください</p>
             <div class="role-buttons">
                 <div class="role-btn boyfriend" id="boyfriendBtn">👨<br>彼氏</div>
@@ -487,64 +501,71 @@
 
             <!-- メインコンテンツ -->
             <div class="main-content">
-                <!-- ホーム画面 -->
-                <div id="homeScreen" class="screen active home-screen">
-                    <div class="mood-section">
-                        <div class="mood-container">
-                            <div class="mood-label">
-                                <span>あなたの気分</span>
-                                <span class="mood-time" id="myMoodTime"></span>
-                            </div>
-                            <input type="range" min="1" max="10" value="5" class="mood-slider" id="myMood">
-                            <div class="mood-value" id="myMoodValue">5 / 10</div>
+                <!-- 相手の気分表示 -->
+                <div class="partner-mood-display">
+                    <div class="partner-mood-info">
+                        <div class="partner-mood-emoji" id="partnerMoodEmoji">😐</div>
+                        <div class="partner-mood-text">
+                            <div class="label" id="partnerLabel">相手の気分</div>
+                            <div class="status normal" id="partnerMoodStatus">普通</div>
                         </div>
-                        <div class="mood-container">
-                            <div class="mood-label">
-                                <span id="partnerName">相手</span>の気分
-                                <span class="mood-time" id="partnerMoodTime">未設定</span>
-                            </div>
-                            <input type="range" min="1" max="10" value="5" class="mood-slider" id="partnerMood" disabled>
-                            <div class="mood-value" id="partnerMoodValue">5 / 10</div>
-                        </div>
-                    </div>
-
-                    <div class="status-section">
-                        <div class="status-label">今のステータス</div>
-                        <div class="status-buttons" id="statusButtons">
-                            <div class="status-btn" data-status="🏠 家">🏠 家</div>
-                            <div class="status-btn" data-status="💼 仕事中">💼 仕事中</div>
-                            <div class="status-btn" data-status="🚶 外出中">🚶 外出中</div>
-                            <div class="status-btn" data-status="🛒 買い物">🛒 買い物</div>
-                            <div class="status-btn" data-status="🍽️ 食事中">🍽️ 食事中</div>
-                            <div class="status-btn" data-status="😴 休憩中">😴 休憩中</div>
-                        </div>
-                    </div>
-
-                    <div class="emergency-section">
-                        <div class="emergency-btn anxiety-btn" id="anxietyBtn">😰 不安</div>
-                        <div class="emergency-btn check-btn" id="checkBtn">💚 大丈夫？</div>
                     </div>
                 </div>
 
-                <!-- チャット画面 -->
-                <div id="chatScreen" class="screen chat-screen">
+                <!-- 相手のステータス表示 -->
+                <div class="partner-status-display" id="partnerStatusDisplay">
+                    <div class="icon">📍</div>
+                    <div class="text" id="partnerCurrentStatus">ステータス未設定</div>
+                </div>
+
+                <!-- 自分の気分 -->
+                <div class="mood-section">
+                    <div class="mood-container">
+                        <div class="mood-label">あなたの気分</div>
+                        <div class="mood-buttons">
+                            <div class="mood-btn bad" data-mood="bad">
+                                😔
+                                <span>あまり<br>良くない</span>
+                            </div>
+                            <div class="mood-btn normal active" data-mood="normal">
+                                😐
+                                <span>普通</span>
+                            </div>
+                            <div class="mood-btn good" data-mood="good">
+                                😊
+                                <span>嬉しい</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ステータス選択 -->
+                <div class="status-section">
+                    <div class="status-label">今のステータス</div>
+                    <div class="status-buttons" id="statusButtons">
+                        <div class="status-btn" data-status="🏠 家">🏠 家</div>
+                        <div class="status-btn" data-status="💼 仕事中">💼 仕事中</div>
+                        <div class="status-btn" data-status="🚶 外出中">🚶 外出中</div>
+                        <div class="status-btn" data-status="🛒 買い物">🛒 買い物</div>
+                        <div class="status-btn" data-status="🍽️ 食事中">🍽️ 食事中</div>
+                        <div class="status-btn" data-status="😴 休憩中">😴 休憩中</div>
+                    </div>
+                </div>
+
+                <!-- 緊急ボタン -->
+                <div class="emergency-section">
+                    <div class="emergency-btn anxiety-btn" id="anxietyBtn">😰 不安</div>
+                    <div class="emergency-btn check-btn" id="checkBtn">💚 大丈夫？</div>
+                </div>
+
+                <!-- チャット（小さく） -->
+                <div class="chat-section">
+                    <div class="chat-label">💬 メッセージ</div>
                     <div class="chat-messages" id="chatMessages"></div>
                     <div class="chat-input-section">
                         <input type="text" class="chat-input" id="chatInput" placeholder="メッセージを入力...">
                         <div class="send-btn" id="sendBtn">送信</div>
                     </div>
-                </div>
-            </div>
-
-            <!-- タブナビゲーション -->
-            <div class="tab-navigation">
-                <div class="tab-btn active" data-screen="homeScreen">
-                    <div class="tab-icon">🏠</div>
-                    <span>ホーム</span>
-                </div>
-                <div class="tab-btn" data-screen="chatScreen">
-                    <div class="tab-icon">💬</div>
-                    <span>チャット</span>
                 </div>
             </div>
         </div>
@@ -556,26 +577,28 @@
 
         let db, userRole = '';
         const ROOM_ID = 'couple_room_001';
-        let lastNotificationTime = 0;
+        let isPartnerOnline = false;
+        let hasShownOnlineNotification = false;
 
-        // 通知機能
-        function showNotification(message) {
-            const now = Date.now();
-            if (now - lastNotificationTime < 2000) return;
-            lastNotificationTime = now;
+        // 通知権限をリクエスト
+        if ('Notification' in window && Notification.permission === 'default') {
+            Notification.requestPermission();
+        }
 
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.textContent = message;
-            document.body.appendChild(notification);
-
+        // プッシュ通知を表示
+        function showPushNotification(title, body) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, {
+                    body: body,
+                    icon: '💕',
+                    badge: '💕',
+                    vibrate: [200, 100, 200]
+                });
+            }
+            
             if ('vibrate' in navigator) {
                 navigator.vibrate([200, 100, 200]);
             }
-
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
         }
 
         // 初期化
@@ -658,23 +681,21 @@
             if (role === 'boyfriend') {
                 header.className = 'header boyfriend';
                 headerTitle.textContent = '👨 彼氏モード';
-                document.getElementById('partnerName').textContent = '彼女';
+                document.getElementById('partnerLabel').textContent = '彼女の気分';
             } else {
                 header.className = 'header girlfriend';
                 headerTitle.textContent = '👩 彼女モード';
-                document.getElementById('partnerName').textContent = '彼氏';
+                document.getElementById('partnerLabel').textContent = '彼氏の気分';
             }
             
             initApp();
         }
 
         function initApp() {
-            setupTabs();
-            setupMoodSlider();
+            setupMoodButtons();
             setupStatusButtons();
             setupOnlineStatus();
             loadMessages();
-            startMoodTimer();
             cleanOldMessages();
             
             const sendBtn = document.getElementById('sendBtn');
@@ -694,17 +715,82 @@
             checkBtn.addEventListener('click', sendCheck);
         }
 
-        // タブ切り替え
-        function setupTabs() {
-            const tabBtns = document.querySelectorAll('.tab-btn');
-            tabBtns.forEach(btn => {
+        // 気分ボタン（3段階）
+        function setupMoodButtons() {
+            const buttons = document.querySelectorAll('.mood-btn');
+            buttons.forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const targetScreen = this.getAttribute('data-screen');
-                    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                    document.getElementById(targetScreen).classList.add('active');
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                    buttons.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
+                    
+                    const mood = this.getAttribute('data-mood');
+                    set(ref(db, `${ROOM_ID}/mood/${userRole}`), {
+                        mood: mood,
+                        timestamp: Date.now()
+                    });
                 });
+            });
+
+            const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
+            onValue(ref(db, `${ROOM_ID}/mood/${partnerRole}`), (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const emoji = document.getElementById('partnerMoodEmoji');
+                    const status = document.getElementById('partnerMoodStatus');
+                    const display = document.querySelector('.partner-mood-display');
+                    
+                    if (data.mood === 'bad') {
+                        emoji.textContent = '😔';
+                        status.textContent = 'あまり良くない';
+                        status.className = 'status bad';
+                        display.style.background = 'linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%)';
+                        
+                        showPushNotification(
+                            '⚠️ 気分の変化',
+                            `${partnerRole === 'girlfriend' ? '彼女' : '彼氏'}の気分があまり良くありません`
+                        );
+                    } else if (data.mood === 'normal') {
+                        emoji.textContent = '😐';
+                        status.textContent = '普通';
+                        status.className = 'status normal';
+                        display.style.background = 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)';
+                    } else if (data.mood === 'good') {
+                        emoji.textContent = '😊';
+                        status.textContent = '嬉しい';
+                        status.className = 'status good';
+                        display.style.background = 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)';
+                    }
+                }
+            });
+        }
+
+        // ステータスボタン
+        function setupStatusButtons() {
+            const buttons = document.querySelectorAll('.status-btn');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    buttons.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const status = this.getAttribute('data-status');
+                    set(ref(db, `${ROOM_ID}/status/${userRole}`), {
+                        text: status,
+                        timestamp: Date.now()
+                    });
+                });
+            });
+
+            const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
+            onValue(ref(db, `${ROOM_ID}/status/${partnerRole}`), (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    document.getElementById('partnerCurrentStatus').textContent = data.text;
+                    
+                    showPushNotification(
+                        '📍 ステータス更新',
+                        `${partnerRole === 'girlfriend' ? '彼女' : '彼氏'}: ${data.text}`
+                    );
+                }
             });
         }
 
@@ -736,12 +822,22 @@
                 
                 if (snapshot.exists()) {
                     const data = snapshot.val();
-                    const isOnline = data.status === 'online' && (Date.now() - data.lastSeen < 60000);
+                    const wasOnline = isPartnerOnline;
+                    isPartnerOnline = data.status === 'online' && (Date.now() - data.lastSeen < 60000);
                     
-                    if (isOnline) {
+                    if (isPartnerOnline) {
                         dot.classList.remove('offline');
                         dot.classList.add('online');
                         text.textContent = '相手: オンライン';
+                        
+                        // 相手がオンラインになった時の通知
+                        if (!wasOnline && hasShownOnlineNotification) {
+                            showPushNotification(
+                                '💚 オンライン通知',
+                                `${partnerRole === 'girlfriend' ? '彼女' : '彼氏'}がオンラインになりました！`
+                            );
+                        }
+                        hasShownOnlineNotification = true;
                     } else {
                         dot.classList.remove('online');
                         dot.classList.add('offline');
@@ -749,81 +845,6 @@
                     }
                 }
             });
-        }
-
-        // ステータスボタン
-        function setupStatusButtons() {
-            const buttons = document.querySelectorAll('.status-btn');
-            buttons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    buttons.forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const status = this.getAttribute('data-status');
-                    set(ref(db, `${ROOM_ID}/status/${userRole}`), {
-                        text: status,
-                        timestamp: Date.now()
-                    });
-                });
-            });
-
-            const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
-            onValue(ref(db, `${ROOM_ID}/status/${partnerRole}`), (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    showNotification(`${partnerRole === 'girlfriend' ? '彼女' : '彼氏'}のステータス: ${data.text}`);
-                    addSystemMessage(`${partnerRole === 'girlfriend' ? '彼女' : '彼氏'}のステータス: ${data.text}`);
-                }
-            });
-        }
-
-        // 気分スライダー
-        function setupMoodSlider() {
-            const myMood = document.getElementById('myMood');
-            const myMoodValue = document.getElementById('myMoodValue');
-            
-            myMood.addEventListener('input', function() {
-                myMoodValue.textContent = this.value + ' / 10';
-                saveMood(this.value);
-            });
-
-            const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
-            onValue(ref(db, `${ROOM_ID}/mood/${partnerRole}`), (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.val();
-                    document.getElementById('partnerMood').value = data.value;
-                    document.getElementById('partnerMoodValue').textContent = data.value + ' / 10';
-                    document.getElementById('partnerMoodTime').textContent = formatTime(data.timestamp);
-                    
-                    if (data.value <= 3) {
-                        showNotification(`⚠️ ${partnerRole === 'girlfriend' ? '彼女' : '彼氏'}の気分が低下しています`);
-                    }
-                }
-            });
-        }
-
-        function saveMood(value) {
-            set(ref(db, `${ROOM_ID}/mood/${userRole}`), {
-                value: parseInt(value),
-                timestamp: Date.now()
-            });
-            document.getElementById('myMoodTime').textContent = '今';
-        }
-
-        function startMoodTimer() {
-            setInterval(() => {
-                const moodRef = ref(db, `${ROOM_ID}/mood/${userRole}`);
-                onValue(moodRef, (snapshot) => {
-                    if (snapshot.exists()) {
-                        const data = snapshot.val();
-                        if (Date.now() - data.timestamp > 7200000) {
-                            document.getElementById('myMood').value = 5;
-                            document.getElementById('myMoodValue').textContent = '5 / 10';
-                            saveMood(5);
-                        }
-                    }
-                }, { onlyOnce: true });
-            }, 60000);
         }
 
         function sendMessage() {
@@ -846,7 +867,6 @@
                 type: 'anxiety',
                 timestamp: Date.now()
             });
-            showNotification('不安ボタンが押されました');
         }
 
         function sendCheck() {
@@ -891,22 +911,26 @@
             div.appendChild(time);
             chatArea.appendChild(div);
 
-            if (msg.sender !== userRole && (msg.type === 'anxiety' || msg.type === 'check')) {
+            if (msg.sender !== userRole) {
                 const partnerName = userRole === 'boyfriend' ? '彼女' : '彼氏';
+                
                 if (msg.type === 'anxiety') {
-                    showNotification(`⚠️ ${partnerName}が不安を感じています！`);
-                } else {
-                    showNotification(`💚 ${partnerName}が心配しています`);
+                    showPushNotification(
+                        '⚠️ 緊急通知',
+                        `${partnerName}が不安を感じています！`
+                    );
+                } else if (msg.type === 'check') {
+                    showPushNotification(
+                        '💚 気遣い通知',
+                        `${partnerName}が心配しています`
+                    );
+                } else if (!msg.type) {
+                    showPushNotification(
+                        '💬 新しいメッセージ',
+                        msg.text
+                    );
                 }
             }
-        }
-
-        function addSystemMessage(text) {
-            push(ref(db, `${ROOM_ID}/messages`), {
-                text: text,
-                type: 'system',
-                timestamp: Date.now()
-            });
         }
 
         function cleanOldMessages() {
