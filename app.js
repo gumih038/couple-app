@@ -161,7 +161,8 @@ function initApp(){
   setupAnniversary();
   setupPeriodTracker();
   setupTimeCapsule();
-  setupHomeReset(); // 追加
+  setupHomeReset();
+  setupPullToRefresh(); // 追加
 }
 
 // タブ切り替え
@@ -797,4 +798,49 @@ function setupHomeReset(){
       }
     });
   }
+}
+
+// プルダウンでリフレッシュ（キャッシュクリア）
+function setupPullToRefresh(){
+  const mainContent = document.querySelector('.main-content');
+  let startY = 0;
+  let pulling = false;
+  
+  mainContent.addEventListener('touchstart', (e)=>{
+    if(mainContent.scrollTop === 0){
+      startY = e.touches[0].pageY;
+      pulling = true;
+    }
+  }, {passive: true});
+  
+  mainContent.addEventListener('touchmove', (e)=>{
+    if(!pulling) return;
+    
+    const currentY = e.touches[0].pageY;
+    const pullDistance = currentY - startY;
+    
+    // 100px以上引っ張ったら
+    if(pullDistance > 100){
+      mainContent.style.background = 'linear-gradient(180deg,#fef3c7 0%,#f8f9fa 100%)';
+    }
+  }, {passive: true});
+  
+  mainContent.addEventListener('touchend', (e)=>{
+    if(!pulling) return;
+    
+    const endY = e.changedTouches[0].pageY;
+    const pullDistance = endY - startY;
+    
+    // 150px以上引っ張ったらリセット
+    if(pullDistance > 150){
+      if(confirm('アプリを初期化しますか？\n全てのローカルデータが削除されます。')){
+        localStorage.clear();
+        window.location.href = window.location.pathname;
+      }
+    }
+    
+    mainContent.style.background = 'linear-gradient(180deg,#f8f9fa 0%,#ffffff 100%)';
+    pulling = false;
+    startY = 0;
+  });
 }
