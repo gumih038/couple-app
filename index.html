@@ -4,14 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>カップル専用アプリ</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -26,7 +21,6 @@
             overflow: hidden;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
         }
-        
         .role-select {
             padding: 40px 20px;
             text-align: center;
@@ -51,6 +45,7 @@
             transition: transform 0.2s;
             color: white;
             font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
         }
         .role-btn.boyfriend {
             background: linear-gradient(135deg, #667eea 0%, #4c63d2 100%);
@@ -58,10 +53,7 @@
         .role-btn.girlfriend {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
-        .role-btn:active {
-            transform: scale(0.95);
-        }
-
+        .role-btn:active { transform: scale(0.95); }
         .header {
             padding: 15px 20px;
             display: flex;
@@ -75,10 +67,7 @@
         .header.girlfriend {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
-        .header h2 {
-            color: white;
-            font-size: 20px;
-        }
+        .header h2 { color: white; font-size: 20px; }
         .connection-status {
             display: flex;
             align-items: center;
@@ -97,11 +86,7 @@
             0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
         }
-
-        .mood-section {
-            padding: 20px;
-            background: #f8f9fa;
-        }
+        .mood-section { padding: 20px; background: #f8f9fa; }
         .mood-container {
             background: white;
             padding: 15px;
@@ -116,10 +101,7 @@
             justify-content: space-between;
             align-items: center;
         }
-        .mood-time {
-            font-size: 12px;
-            color: #999;
-        }
+        .mood-time { font-size: 12px; color: #999; }
         .mood-slider {
             width: 100%;
             height: 40px;
@@ -144,11 +126,7 @@
             margin-top: 10px;
             color: #667eea;
         }
-
-        .status-section {
-            padding: 0 20px 20px 20px;
-            background: #f8f9fa;
-        }
+        .status-section { padding: 0 20px 20px 20px; background: #f8f9fa; }
         .status-input {
             width: 100%;
             padding: 12px;
@@ -157,16 +135,8 @@
             font-size: 14px;
             transition: border 0.3s;
         }
-        .status-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .emergency-section {
-            padding: 20px;
-            display: flex;
-            gap: 10px;
-        }
+        .status-input:focus { outline: none; border-color: #667eea; }
+        .emergency-section { padding: 20px; display: flex; gap: 10px; }
         .emergency-btn {
             flex: 1;
             padding: 15px;
@@ -177,6 +147,7 @@
             cursor: pointer;
             transition: transform 0.2s;
             color: white;
+            -webkit-tap-highlight-color: transparent;
         }
         .anxiety-btn {
             background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
@@ -184,10 +155,7 @@
         .check-btn {
             background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
         }
-        .emergency-btn:active {
-            transform: scale(0.95);
-        }
-
+        .emergency-btn:active { transform: scale(0.95); }
         .chat-section {
             height: 400px;
             overflow-y: auto;
@@ -200,14 +168,8 @@
             clear: both;
         }
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .message-content {
             display: inline-block;
@@ -227,21 +189,14 @@
             border-bottom-right-radius: 5px;
             float: right;
         }
-        .message.system {
-            text-align: center;
-        }
+        .message.system { text-align: center; }
         .message.system .message-content {
             background: #fef3c7;
             color: #92400e;
             font-size: 13px;
             border-radius: 20px;
         }
-        .message-time {
-            font-size: 11px;
-            color: #999;
-            margin-top: 5px;
-        }
-
+        .message-time { font-size: 11px; color: #999; margin-top: 5px; }
         .input-section {
             padding: 15px;
             border-top: 1px solid #eee;
@@ -256,10 +211,7 @@
             border-radius: 20px;
             font-size: 14px;
         }
-        .chat-input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
+        .chat-input:focus { outline: none; border-color: #667eea; }
         .send-btn {
             padding: 10px 20px;
             background: #667eea;
@@ -268,22 +220,12 @@
             border-radius: 20px;
             cursor: pointer;
             font-weight: bold;
+            -webkit-tap-highlight-color: transparent;
         }
-        .send-btn:active {
-            background: #4c63d2;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .firebase-setup {
-            padding: 30px 20px;
-        }
-        .firebase-setup h2 {
-            color: #667eea;
-            margin-bottom: 20px;
-        }
+        .send-btn:active { background: #4c63d2; }
+        .hidden { display: none; }
+        .firebase-setup { padding: 30px 20px; }
+        .firebase-setup h2 { color: #667eea; margin-bottom: 20px; }
         .setup-input {
             width: 100%;
             padding: 12px;
@@ -294,17 +236,20 @@
         }
         .setup-btn {
             width: 100%;
-            padding: 15px;
+            padding: 20px;
             background: #667eea;
             color: white;
             border: none;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
         }
-        .setup-btn:active {
-            transform: scale(0.98);
+        .setup-btn:active { 
+            background: #5568d3;
+            transform: scale(0.98); 
         }
         .setup-info {
             background: #fef3c7;
@@ -313,6 +258,14 @@
             margin-bottom: 20px;
             font-size: 13px;
             line-height: 1.6;
+        }
+        .debug-info {
+            margin-top: 15px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 5px;
+            font-size: 12px;
+            color: #666;
         }
     </style>
 </head>
@@ -324,22 +277,21 @@
                 <strong>初回のみ設定が必要です</strong><br>
                 Firebase Consoleで取得した設定情報を入力してください。
             </div>
-            <input type="text" class="setup-input" id="apiKey" placeholder="API Key">
-            <input type="text" class="setup-input" id="authDomain" placeholder="Auth Domain">
-            <input type="text" class="setup-input" id="projectId" placeholder="Project ID">
-            <input type="text" class="setup-input" id="databaseURL" placeholder="Database URL">
-            <button class="setup-btn" id="saveConfigBtn">設定を保存</button>
+            <input type="text" class="setup-input" id="apiKey" placeholder="API Key" value="AIzaSyAGeO5vSgT0ZUkritJHa8-Zu1vkm7KoMFw">
+            <input type="text" class="setup-input" id="authDomain" placeholder="Auth Domain" value="couple-app-b8038.firebaseapp.com">
+            <input type="text" class="setup-input" id="projectId" placeholder="Project ID" value="couple-app-b8038">
+            <input type="text" class="setup-input" id="databaseURL" placeholder="Database URL" value="https://couple-app-b8038-default-rtdb.asia-southeast1.firebasedatabase.app">
+            <div id="saveConfigBtn" class="setup-btn">設定を保存</div>
+            <div id="debugInfo" class="debug-info">タップを待っています...</div>
         </div>
-
         <div id="roleSelect" class="role-select hidden">
             <h1>💕 ようこそ</h1>
             <p style="color: #666; margin-bottom: 30px;">あなたの役割を選択してください</p>
             <div class="role-buttons">
-                <button class="role-btn boyfriend" id="boyfriendBtn">👨 彼氏</button>
-                <button class="role-btn girlfriend" id="girlfriendBtn">👩 彼女</button>
+                <div class="role-btn boyfriend" id="boyfriendBtn">👨 彼氏</div>
+                <div class="role-btn girlfriend" id="girlfriendBtn">👩 彼女</div>
             </div>
         </div>
-
         <div id="mainApp" class="hidden">
             <div class="header" id="header">
                 <h2 id="headerTitle"></h2>
@@ -348,7 +300,6 @@
                     <span>接続中</span>
                 </div>
             </div>
-
             <div class="mood-section">
                 <div class="mood-container">
                     <div class="mood-label">
@@ -367,83 +318,149 @@
                     <div class="mood-value" id="partnerMoodValue">5 / 10</div>
                 </div>
             </div>
-
             <div class="status-section">
                 <input type="text" class="status-input" id="statusInput" placeholder="今どこで何してる？（例：家でゆっくり中）">
             </div>
-
             <div class="emergency-section">
-                <button class="emergency-btn anxiety-btn" id="anxietyBtn">😰 不安</button>
-                <button class="emergency-btn check-btn" id="checkBtn">💚 大丈夫？</button>
+                <div class="emergency-btn anxiety-btn" id="anxietyBtn">😰 不安</div>
+                <div class="emergency-btn check-btn" id="checkBtn">💚 大丈夫？</div>
             </div>
-
             <div class="chat-section" id="chatArea"></div>
-
             <div class="input-section">
                 <input type="text" class="chat-input" id="chatInput" placeholder="メッセージを入力...">
-                <button class="send-btn" id="sendBtn">送信</button>
+                <div class="send-btn" id="sendBtn">送信</div>
             </div>
         </div>
     </div>
-
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, onValue, push, remove } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-        let db;
-        let userRole = '';
+        let db, userRole = '';
         const ROOM_ID = 'couple_room_001';
 
-        window.addEventListener('load', function() {
+        // デバッグ用の表示
+        function debugLog(msg) {
+            const debugInfo = document.getElementById('debugInfo');
+            if (debugInfo) {
+                debugInfo.textContent = msg;
+            }
+            console.log(msg);
+        }
+
+        // ページ読み込み完了後に実行
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initFirebase);
+        } else {
             initFirebase();
-        });
+        }
 
         function initFirebase() {
+            debugLog('初期化開始...');
+            
+            // 保存ボタンのイベント設定（複数の方法で試す）
             const saveBtn = document.getElementById('saveConfigBtn');
             if (saveBtn) {
-                saveBtn.onclick = function() {
-                    const config = {
-                        apiKey: document.getElementById('apiKey').value.trim(),
-                        authDomain: document.getElementById('authDomain').value.trim(),
-                        projectId: document.getElementById('projectId').value.trim(),
-                        databaseURL: document.getElementById('databaseURL').value.trim()
-                    };
-
-                    if (!config.apiKey || !config.authDomain || !config.projectId || !config.databaseURL) {
-                        alert('すべての項目を入力してください');
-                        return;
-                    }
-
-                    localStorage.setItem('firebaseConfig', JSON.stringify(config));
-                    alert('設定を保存しました！');
-                    location.reload();
-                };
+                // タッチイベント
+                saveBtn.addEventListener('touchstart', handleSave, { passive: false });
+                saveBtn.addEventListener('touchend', function(e) {
+                    e.preventDefault();
+                }, { passive: false });
+                
+                // クリックイベント
+                saveBtn.addEventListener('click', handleSave);
+                
+                // マウスダウンイベント
+                saveBtn.addEventListener('mousedown', handleSave);
+                
+                debugLog('ボタンイベント設定完了');
+            } else {
+                debugLog('エラー: ボタンが見つかりません');
             }
 
+            // 既存の設定をチェック
             const configStr = localStorage.getItem('firebaseConfig');
-            if (!configStr) {
-                document.getElementById('firebaseSetup').classList.remove('hidden');
-                return;
+            if (configStr) {
+                debugLog('既存の設定を検出');
+                try {
+                    const config = JSON.parse(configStr);
+                    connectFirebase(config);
+                } catch (error) {
+                    debugLog('設定の読み込みエラー: ' + error.message);
+                    localStorage.removeItem('firebaseConfig');
+                }
+            } else {
+                debugLog('新規設定が必要です');
+            }
+        }
+
+        function handleSave(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            debugLog('保存ボタンがタップされました！');
+            
+            const config = {
+                apiKey: document.getElementById('apiKey').value.trim(),
+                authDomain: document.getElementById('authDomain').value.trim(),
+                projectId: document.getElementById('projectId').value.trim(),
+                databaseURL: document.getElementById('databaseURL').value.trim()
+            };
+
+            debugLog('設定を確認中...');
+
+            if (!config.apiKey || !config.authDomain || !config.projectId || !config.databaseURL) {
+                debugLog('エラー: すべての項目を入力してください');
+                alert('すべての項目を入力してください');
+                return false;
             }
 
+            debugLog('設定を保存中...');
+            
             try {
-                const config = JSON.parse(configStr);
+                localStorage.setItem('firebaseConfig', JSON.stringify(config));
+                debugLog('保存成功！Firebaseに接続中...');
+                connectFirebase(config);
+            } catch (error) {
+                debugLog('保存エラー: ' + error.message);
+                alert('保存に失敗しました: ' + error.message);
+            }
+            
+            return false;
+        }
+
+        function connectFirebase(config) {
+            try {
+                debugLog('Firebase接続中...');
                 const app = initializeApp(config);
                 db = getDatabase(app);
                 
+                debugLog('接続成功！役割選択画面へ');
                 document.getElementById('firebaseSetup').classList.add('hidden');
                 document.getElementById('roleSelect').classList.remove('hidden');
                 
-                document.getElementById('boyfriendBtn').onclick = () => selectRole('boyfriend');
-                document.getElementById('girlfriendBtn').onclick = () => selectRole('girlfriend');
+                // 役割選択ボタン
+                document.getElementById('boyfriendBtn').addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    selectRole('boyfriend');
+                });
+                document.getElementById('girlfriendBtn').addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    selectRole('girlfriend');
+                });
+                
+                document.getElementById('boyfriendBtn').addEventListener('click', () => selectRole('boyfriend'));
+                document.getElementById('girlfriendBtn').addEventListener('click', () => selectRole('girlfriend'));
                 
                 const savedRole = localStorage.getItem('userRole');
                 if (savedRole) {
                     selectRole(savedRole);
                 }
             } catch (error) {
+                debugLog('Firebase接続エラー: ' + error.message);
                 alert('Firebase接続エラー: ' + error.message);
                 localStorage.removeItem('firebaseConfig');
+                document.getElementById('firebaseSetup').classList.remove('hidden');
             }
         }
 
@@ -477,23 +494,40 @@
             startMoodTimer();
             cleanOldMessages();
             
-            document.getElementById('sendBtn').onclick = sendMessage;
-            document.getElementById('chatInput').onkeypress = function(e) {
-                if (e.key === 'Enter') sendMessage();
-            };
-            document.getElementById('anxietyBtn').onclick = sendAnxiety;
-            document.getElementById('checkBtn').onclick = sendCheck;
+            // イベントリスナー設定（タッチとクリック両方）
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                sendMessage();
+            });
+            sendBtn.addEventListener('click', sendMessage);
+            
+            document.getElementById('chatInput').addEventListener('keypress', (e) => { 
+                if (e.key === 'Enter') sendMessage(); 
+            });
+            
+            const anxietyBtn = document.getElementById('anxietyBtn');
+            anxietyBtn.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                sendAnxiety();
+            });
+            anxietyBtn.addEventListener('click', sendAnxiety);
+            
+            const checkBtn = document.getElementById('checkBtn');
+            checkBtn.addEventListener('touchstart', function(e) {
+                e.preventDefault();
+                sendCheck();
+            });
+            checkBtn.addEventListener('click', sendCheck);
         }
 
         function setupMoodSlider() {
             const myMood = document.getElementById('myMood');
             const myMoodValue = document.getElementById('myMoodValue');
-            
-            myMood.oninput = function() {
+            myMood.addEventListener('input', function() {
                 myMoodValue.textContent = this.value + ' / 10';
                 saveMood(this.value);
-            };
-
+            });
             const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
             onValue(ref(db, `${ROOM_ID}/mood/${partnerRole}`), (snapshot) => {
                 if (snapshot.exists()) {
@@ -514,13 +548,12 @@
         }
 
         function startMoodTimer() {
-            const TWO_HOURS = 2 * 60 * 60 * 1000;
             setInterval(() => {
                 const moodRef = ref(db, `${ROOM_ID}/mood/${userRole}`);
                 onValue(moodRef, (snapshot) => {
                     if (snapshot.exists()) {
                         const data = snapshot.val();
-                        if (Date.now() - data.timestamp > TWO_HOURS) {
+                        if (Date.now() - data.timestamp > 7200000) {
                             document.getElementById('myMood').value = 5;
                             document.getElementById('myMoodValue').textContent = '5 / 10';
                             saveMood(5);
@@ -532,13 +565,12 @@
 
         function setupStatusListener() {
             const statusInput = document.getElementById('statusInput');
-            statusInput.onchange = function() {
+            statusInput.addEventListener('change', function() {
                 set(ref(db, `${ROOM_ID}/status/${userRole}`), {
                     text: this.value,
                     timestamp: Date.now()
                 });
-            };
-
+            });
             const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
             onValue(ref(db, `${ROOM_ID}/status/${partnerRole}`), (snapshot) => {
                 if (snapshot.exists()) {
@@ -599,15 +631,12 @@
             const chatArea = document.getElementById('chatArea');
             const div = document.createElement('div');
             div.className = msg.type === 'system' ? 'message system' : `message ${msg.sender}`;
-            
             const content = document.createElement('div');
             content.className = 'message-content';
             content.textContent = msg.text;
-            
             const time = document.createElement('div');
             time.className = 'message-time';
             time.textContent = formatTime(msg.timestamp);
-            
             div.appendChild(content);
             div.appendChild(time);
             chatArea.appendChild(div);
@@ -623,7 +652,7 @@
 
         function cleanOldMessages() {
             setInterval(() => {
-                const oneDayAgo = Date.now() - (24 * 60 * 60 * 1000);
+                const oneDayAgo = Date.now() - 86400000;
                 onValue(ref(db, `${ROOM_ID}/messages`), (snapshot) => {
                     if (snapshot.exists()) {
                         snapshot.forEach((child) => {
@@ -639,9 +668,7 @@
 
         function formatTime(timestamp) {
             const date = new Date(timestamp);
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            return `${hours}:${minutes}`;
+            return date.getHours().toString().padStart(2, '0') + ':' + date.getMinutes().toString().padStart(2, '0');
         }
     </script>
 </body>
