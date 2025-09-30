@@ -1,14 +1,22 @@
 *{margin:0;padding:0;box-sizing:border-box}
 
-html,body{
+html{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+}
+
+body{
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
   background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
   width:100%;
-  height:100vh;
-  height:100dvh;
-  position:relative;
+  height:100%;
   overflow:hidden;
-  -webkit-overflow-scrolling:touch;
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
 }
 
 .container{
@@ -16,13 +24,11 @@ html,body{
   margin:0 auto;
   background:#fff;
   width:100%;
-  height:100vh;
-  height:100dvh;
+  height:100%;
   display:flex;
   flex-direction:column;
   position:relative;
   animation:fadeIn 0.6s ease-out;
-  overflow:hidden;
 }
 
 @keyframes fadeIn{
@@ -34,7 +40,7 @@ html,body{
 .firebase-setup{
   padding:30px 20px;
   height:100%;
-  overflow-y:auto;
+  overflow-y:scroll;
   -webkit-overflow-scrolling:touch;
   animation:slideUp 0.5s ease-out;
 }
@@ -125,7 +131,7 @@ html,body{
   padding:40px 20px;
   text-align:center;
   height:100%;
-  overflow-y:auto;
+  overflow-y:scroll;
   -webkit-overflow-scrolling:touch;
   animation:fadeIn 0.6s ease-out;
 }
@@ -283,18 +289,290 @@ html,body{
 
 /* メイン */
 .main-content{
-  flex:1;
+  flex:1 1 0;
   min-height:0;
+  height:0;
   overflow-y:scroll;
   overflow-x:hidden;
   -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
   padding:20px 20px 80px;
   background:linear-gradient(180deg,#f8f9fa 0%,#ffffff 100%);
   position:relative;
 }
 
-.screen{display:none}
-.screen:not(.hidden){display:block}
+.screen{
+  display:none;
+  min-height:100%;
+}
+.screen:not(.hidden){
+  display:block;
+}
+
+/* 記念日カウンター */
+.anniversary-section{
+  margin-bottom:20px;
+  animation:slideUp 0.6s ease-out 0.2s both;
+}
+
+.anniversary-card{
+  background:linear-gradient(135deg,#fff5f5,#ffe4e6);
+  padding:20px;
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  display:flex;
+  align-items:center;
+  gap:15px;
+  border:2px solid #fda4af;
+}
+
+.anniversary-icon{
+  font-size:48px;
+  animation:heartbeat 1.5s infinite;
+}
+
+@keyframes heartbeat{
+  0%,100%{transform:scale(1)}
+  25%{transform:scale(1.1)}
+  50%{transform:scale(1)}
+}
+
+.anniversary-info{
+  flex:1;
+}
+
+.anniversary-label{
+  font-size:12px;
+  color:#9ca3af;
+  margin-bottom:4px;
+}
+
+.anniversary-days{
+  font-size:24px;
+  font-weight:bold;
+  color:#f43f5e;
+  margin-bottom:4px;
+}
+
+.anniversary-date{
+  font-size:11px;
+  color:#6b7280;
+}
+
+.anniversary-set-btn{
+  padding:10px 16px;
+  background:linear-gradient(135deg,#f43f5e,#e11d48);
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 2px 8px rgba(244,63,94,0.3);
+  transition:all 0.3s;
+}
+
+.anniversary-set-btn:active{
+  transform:scale(0.95);
+}
+
+/* 女の子の日（彼女側） */
+.period-section{
+  margin-bottom:20px;
+  animation:slideUp 0.6s ease-out 0.25s both;
+}
+
+.period-card{
+  background:linear-gradient(135deg,#fef3f2,#fee2e2);
+  padding:18px;
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  border:2px solid #fca5a5;
+}
+
+.period-header{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:12px;
+}
+
+.period-icon{
+  font-size:24px;
+}
+
+.period-title{
+  font-size:15px;
+  font-weight:700;
+  color:#dc2626;
+}
+
+.period-buttons{
+  display:flex;
+  gap:8px;
+  margin-bottom:12px;
+}
+
+.period-btn{
+  flex:1;
+  padding:10px;
+  background:linear-gradient(135deg,#dc2626,#b91c1c);
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.3s;
+}
+
+.period-btn.secondary{
+  background:linear-gradient(135deg,#9ca3af,#6b7280);
+}
+
+.period-btn:active{
+  transform:scale(0.95);
+}
+
+.period-status{
+  font-size:12px;
+  color:#6b7280;
+  text-align:center;
+}
+
+/* 相手の女の子の日（彼氏側） */
+.partner-period-section{
+  margin-bottom:20px;
+  animation:slideUp 0.6s ease-out 0.25s both;
+}
+
+.partner-period-card{
+  background:linear-gradient(135deg,#fef3f2,#fee2e2);
+  padding:16px;
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  display:flex;
+  align-items:center;
+  gap:12px;
+  border:2px solid #fca5a5;
+}
+
+.partner-period-icon{
+  font-size:32px;
+}
+
+.partner-period-info{
+  flex:1;
+}
+
+.partner-period-status{
+  font-size:14px;
+  color:#dc2626;
+  font-weight:600;
+}
+
+/* タイムカプセル */
+.capsule-section{
+  background:linear-gradient(135deg,#fff,#f8f9fa);
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.08);
+  animation:slideUp 0.6s ease-out 0.3s both;
+}
+
+.capsule-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:15px;
+}
+
+.capsule-title{
+  font-weight:700;
+  color:#444;
+  font-size:16px;
+}
+
+.capsule-create-btn{
+  padding:8px 16px;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  box-shadow:0 2px 8px rgba(102,126,234,0.3);
+  transition:all 0.3s;
+}
+
+.capsule-create-btn:active{
+  transform:scale(0.95);
+}
+
+.capsule-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.capsule-item{
+  background:#fff;
+  padding:14px;
+  border-radius:12px;
+  border:2px solid #e5e7eb;
+  transition:all 0.3s;
+}
+
+.capsule-item.locked{
+  border-color:#f59e0b;
+  background:linear-gradient(135deg,#fffbeb,#fef3c7);
+}
+
+.capsule-item.unlocked{
+  border-color:#10b981;
+  background:linear-gradient(135deg,#f0fdf4,#dcfce7);
+  cursor:pointer;
+}
+
+.capsule-item.unlocked:active{
+  transform:scale(0.98);
+}
+
+.capsule-item-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:8px;
+}
+
+.capsule-from{
+  font-size:13px;
+  font-weight:600;
+  color:#667eea;
+}
+
+.capsule-countdown{
+  font-size:11px;
+  color:#f59e0b;
+  font-weight:600;
+}
+
+.capsule-countdown.opened{
+  color:#10b981;
+}
+
+.capsule-preview{
+  font-size:12px;
+  color:#6b7280;
+  margin-bottom:6px;
+}
+
+.capsule-date{
+  font-size:11px;
+  color:#9ca3af;
+}
 
 /* 気分 */
 .mood-section{
