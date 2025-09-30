@@ -1225,3 +1225,28 @@ body{
   height:100%;
   width:100%;
 }
+
+/* 初期化ボタン */
+.reset-section{
+  margin-top:30px;
+  margin-bottom:20px;
+  text-align:center;
+}
+
+.reset-btn{
+  padding:12px 24px;
+  background:#ef4444;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.3s;
+  box-shadow:0 2px 8px rgba(239,68,68,0.3);
+}
+
+.reset-btn:active{
+  transform:scale(0.95);
+  box-shadow:0 1px 4px rgba(239,68,68,0.2);
+}
