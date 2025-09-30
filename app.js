@@ -559,7 +559,21 @@ function setupAnniversary(){
     const diffTime = now - start;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-    daysCountEl.textContent = `${diffDays}日目`;
+    // 年月日を計算
+    const years = Math.floor(diffDays / 365);
+    const months = Math.floor((diffDays % 365) / 30);
+    const days = Math.floor((diffDays % 365) % 30);
+    
+    let displayText = '';
+    if(years > 0){
+      displayText = `${years}年${months}ヶ月`;
+    }else if(months > 0){
+      displayText = `${months}ヶ月${days}日`;
+    }else{
+      displayText = `${days}日`;
+    }
+    
+    daysCountEl.textContent = displayText;
     startDateEl.textContent = start.toLocaleDateString('ja-JP', {year:'numeric', month:'long', day:'numeric'});
   }
   
