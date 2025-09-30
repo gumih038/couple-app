@@ -548,6 +548,7 @@
                         <div class="partner-mood-text">
                             <div class="label" id="partnerLabel">相手の気分</div>
                             <div class="status normal" id="partnerMoodStatus">普通</div>
+                            <div class="time-label" id="partnerMoodTime">未設定</div>
                         </div>
                     </div>
                 </div>
@@ -555,13 +556,19 @@
                 <!-- 相手のステータス表示 -->
                 <div class="partner-status-display" id="partnerStatusDisplay">
                     <div class="icon">📍</div>
-                    <div class="text" id="partnerCurrentStatus">ステータス未設定</div>
+                    <div class="status-info">
+                        <div class="text" id="partnerCurrentStatus">ステータス未設定</div>
+                        <div class="time-label" id="partnerStatusTime">未設定</div>
+                    </div>
                 </div>
 
                 <!-- 自分の気分 -->
                 <div class="mood-section">
                     <div class="mood-container">
-                        <div class="mood-label">あなたの気分</div>
+                        <div class="mood-label-row">
+                            <div class="mood-label">あなたの気分</div>
+                            <div class="time-label" id="myMoodTime">未設定</div>
+                        </div>
                         <div class="mood-buttons">
                             <div class="mood-btn bad" data-mood="bad">
                                 😔
@@ -581,7 +588,10 @@
 
                 <!-- ステータス選択 -->
                 <div class="status-section">
-                    <div class="status-label">今のステータス</div>
+                    <div class="mood-label-row">
+                        <div class="status-label">今のステータス</div>
+                        <div class="time-label" id="myStatusTime">未設定</div>
+                    </div>
                     <div class="status-buttons" id="statusButtons">
                         <div class="status-btn" data-status="🏠 家">🏠 家</div>
                         <div class="status-btn" data-status="💼 仕事中">💼 仕事中</div>
@@ -775,10 +785,14 @@
                     this.classList.add('active');
                     
                     const mood = this.getAttribute('data-mood');
+                    const now = Date.now();
                     set(ref(db, `${ROOM_ID}/mood/${userRole}`), {
                         mood: mood,
-                        timestamp: Date.now()
+                        timestamp: now
                     });
+                    
+                    // 自分の気分の時間を更新
+                    document.getElementById('myMoodTime').textContent = formatTime(now);
                 });
             });
 
@@ -790,7 +804,11 @@
                     const data = snapshot.val();
                     const emoji = document.getElementById('partnerMoodEmoji');
                     const status = document.getElementById('partnerMoodStatus');
+                    const timeLabel = document.getElementById('partnerMoodTime');
                     const display = document.querySelector('.partner-mood-display');
+                    
+                    // 時間を表示
+                    timeLabel.textContent = formatTimeWithRelative(data.timestamp);
                     
                     // 変更があった場合のみ通知
                     const shouldNotify = lastMood !== '' && lastMood !== data.mood;
@@ -821,6 +839,17 @@
                     }
                 }
             });
+            
+            // 時間表示を1分ごとに更新
+            setInterval(() => {
+                const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
+                onValue(ref(db, `${ROOM_ID}/mood/${partnerRole}`), (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        document.getElementById('partnerMoodTime').textContent = formatTimeWithRelative(data.timestamp);
+                    }
+                }, { onlyOnce: true });
+            }, 60000);
         }
 
         // ステータスボタン
@@ -832,10 +861,14 @@
                     this.classList.add('active');
                     
                     const status = this.getAttribute('data-status');
+                    const now = Date.now();
                     set(ref(db, `${ROOM_ID}/status/${userRole}`), {
                         text: status,
-                        timestamp: Date.now()
+                        timestamp: now
                     });
+                    
+                    // 自分のステータスの時間を更新
+                    document.getElementById('myStatusTime').textContent = formatTime(now);
                 });
             });
 
@@ -846,6 +879,7 @@
                 if (snapshot.exists()) {
                     const data = snapshot.val();
                     document.getElementById('partnerCurrentStatus').textContent = data.text;
+                    document.getElementById('partnerStatusTime').textContent = formatTimeWithRelative(data.timestamp);
                     
                     // 変更があった場合のみ通知
                     if (lastStatus !== '' && lastStatus !== data.text) {
@@ -857,6 +891,17 @@
                     lastStatus = data.text;
                 }
             });
+            
+            // 時間表示を1分ごとに更新
+            setInterval(() => {
+                const partnerRole = userRole === 'boyfriend' ? 'girlfriend' : 'boyfriend';
+                onValue(ref(db, `${ROOM_ID}/status/${partnerRole}`), (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        document.getElementById('partnerStatusTime').textContent = formatTimeWithRelative(data.timestamp);
+                    }
+                }, { onlyOnce: true });
+            }, 60000);
         }
 
         // オンラインステータス
