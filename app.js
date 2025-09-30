@@ -132,6 +132,9 @@ function initApp(){
   setupTodos();
   subscribePartnerState();
   setupSettings();
+  setupAnniversary();
+  setupPeriodTracker();
+  setupTimeCapsule();
 }
 
 // タブ切り替え
@@ -512,8 +515,7 @@ function subscribePartnerState(){
     const v = snap.val();
     if (!v) return;
     
-    const statusText = v.text || 'ステータス未設定';
-    document.getElementById('partnerCurrentStatus').textContent = statusText.replace(/[🏠💼🚶🛒🍽️😴]\s*/, '');
+    document.getElementById('partnerCurrentStatus').textContent = v.text || 'ステータス未設定';
     document.getElementById('partnerStatusTime').textContent = formatTimeRelative(v.ts);
     
     if (lastStatus && lastStatus !== v.text && settings.notifyStatus){
