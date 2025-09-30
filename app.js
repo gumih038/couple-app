@@ -466,6 +466,17 @@ function subscribePartnerState(){
 
 // 設定
 function setupSettings(){
+  // 強制リセットボタン（最優先で追加）
+  const forceResetBtn = document.getElementById('forceResetBtn');
+  if(forceResetBtn){
+    forceResetBtn.addEventListener('click', ()=>{
+      if(confirm('強制的に初期画面に戻りますか？\n全ての設定がリセットされます。')){
+        localStorage.clear();
+        window.location.href = window.location.pathname;
+      }
+    });
+  }
+  
   // 設定値を反映
   Object.keys(settings).forEach(key => {
     const el = document.getElementById(key);
@@ -500,15 +511,13 @@ function setupSettings(){
   });
   
   // アプリリセット
-document.getElementById('resetAppBtn').addEventListener('click', ()=>{
-  if(confirm('本当にアプリをリセットしますか？\n全てのデータが削除されます。')){
-    localStorage.clear();
-    // ページを完全にリロード
-    window.location.href = window.location.href.split('?')[0];
-  }
-　});
+  document.getElementById('resetAppBtn').addEventListener('click', ()=>{
+    if(confirm('本当にアプリをリセットしますか？\n全てのデータが削除されます。')){
+      localStorage.clear();
+      window.location.href = window.location.pathname;
+    }
+  });
 }
-
 function loadSettings(){
   const saved = localStorage.getItem('appSettings');
   if(saved){
