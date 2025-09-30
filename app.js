@@ -45,14 +45,21 @@ function bootstrap(){
   const cfgStr = localStorage.getItem('firebaseConfig');
   if (cfgStr){
     try{
-      connectFirebase(JSON.parse(cfgStr));
+      const config = JSON.parse(cfgStr);
+      connectFirebase(config);
     }catch{
       localStorage.removeItem('firebaseConfig');
+      // エラー時は設定画面を表示
+      document.getElementById('firebaseSetup').classList.remove('hidden');
     }
   }
   
   const saveBtn = document.getElementById('saveConfigBtn');
   if (saveBtn){
+    // 既存のイベントリスナーをクリア
+    const newSaveBtn = saveBtn.cloneNode(true);
+    saveBtn.parentNode.replaceChild(newSaveBtn, saveBtn);
+    
     const handleSave = (e)=>{
       e.preventDefault();
       const config = {
@@ -67,13 +74,23 @@ function bootstrap(){
         return;
       }
       localStorage.setItem('firebaseConfig', JSON.stringify(config));
-      connectFirebase(config);
+      
+      // 画面遷移を確実に実行
+      try{
+        connectFirebase(config);
+      }catch(err){
+        alert('Firebase接続エラー: ' + err.message);
+        localStorage.removeItem('firebaseConfig');
+      }
     };
-    saveBtn.addEventListener('click', handleSave);
-    saveBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); handleSave(e); }, {passive:false});
+    
+    newSaveBtn.addEventListener('click', handleSave);
+    newSaveBtn.addEventListener('touchstart', (e)=>{ 
+      e.preventDefault(); 
+      handleSave(e); 
+    }, {passive:false});
   }
 }
-
 function connectFirebase(config){
   try{
     // 既存のFirebaseアプリがあれば削除
