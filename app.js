@@ -512,7 +512,8 @@ function subscribePartnerState(){
     const v = snap.val();
     if (!v) return;
     
-    document.getElementById('partnerCurrentStatus').textContent = v.text || 'ステータス未設定';
+    const statusText = v.text || 'ステータス未設定';
+    document.getElementById('partnerCurrentStatus').textContent = statusText.replace(/[🏠💼🚶🛒🍽️😴]\s*/, '');
     document.getElementById('partnerStatusTime').textContent = formatTimeRelative(v.ts);
     
     if (lastStatus && lastStatus !== v.text && settings.notifyStatus){
