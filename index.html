@@ -79,6 +79,53 @@
           </div>
           <div class="typing-indicator" id="typingIndicator" aria-live="polite"></div>
 
+          <!-- 記念日カウンター -->
+          <div class="anniversary-section">
+            <div class="anniversary-card">
+              <div class="anniversary-icon">💕</div>
+              <div class="anniversary-info">
+                <div class="anniversary-label">付き合って</div>
+                <div class="anniversary-days" id="daysCount">0日目</div>
+                <div class="anniversary-date" id="startDate">記念日を設定してください</div>
+              </div>
+              <button class="anniversary-set-btn" id="setAnniversaryBtn">設定</button>
+            </div>
+          </div>
+
+          <!-- 女の子の日トラッカー（彼女側のみ） -->
+          <div class="period-section hidden" id="periodSection">
+            <div class="period-card">
+              <div class="period-header">
+                <div class="period-icon">🌸</div>
+                <div class="period-title">女の子の日</div>
+              </div>
+              <div class="period-buttons">
+                <button class="period-btn" id="periodStartBtn">今日から</button>
+                <button class="period-btn secondary" id="periodEndBtn">終了</button>
+              </div>
+              <div class="period-status" id="periodStatus">未設定</div>
+            </div>
+          </div>
+
+          <!-- 相手の女の子の日状態（彼氏側のみ） -->
+          <div class="partner-period-section hidden" id="partnerPeriodSection">
+            <div class="partner-period-card">
+              <div class="partner-period-icon">🌸</div>
+              <div class="partner-period-info" id="partnerPeriodInfo">
+                <div class="partner-period-status">状態: 未設定</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- タイムカプセル -->
+          <div class="capsule-section">
+            <div class="capsule-header">
+              <div class="capsule-title">⏳ タイムカプセル</div>
+              <button class="capsule-create-btn" id="createCapsuleBtn">作成</button>
+            </div>
+            <div class="capsule-list" id="capsuleList"></div>
+          </div>
+
           <!-- 自分の気分 -->
           <div class="mood-section">
             <div class="mood-container">
