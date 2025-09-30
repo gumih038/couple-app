@@ -76,6 +76,9 @@ function bootstrap(){
 
 function connectFirebase(config){
   try{
+    // 既存のFirebaseアプリがあれば削除
+    const existingApps = typeof firebase !== 'undefined' ? firebase.apps : [];
+    
     const app = initializeApp(config);
     db = getDatabase(app);
 
@@ -105,10 +108,20 @@ function connectFirebase(config){
       initApp();
     };
 
-    document.getElementById('boyfriendBtn').addEventListener('click', ()=>setRole('boyfriend'));
-    document.getElementById('girlfriendBtn').addEventListener('click', ()=>setRole('girlfriend'));
-    document.getElementById('boyfriendBtn').addEventListener('touchstart', (e)=>{ e.preventDefault(); setRole('boyfriend'); }, {passive:false});
-    document.getElementById('girlfriendBtn').addEventListener('touchstart', (e)=>{ e.preventDefault(); setRole('girlfriend'); }, {passive:false});
+    // 既存のイベントリスナーを削除してから新しく追加
+    const boyfriendBtn = document.getElementById('boyfriendBtn');
+    const girlfriendBtn = document.getElementById('girlfriendBtn');
+    
+    const newBoyfriendBtn = boyfriendBtn.cloneNode(true);
+    const newGirlfriendBtn = girlfriendBtn.cloneNode(true);
+    
+    boyfriendBtn.parentNode.replaceChild(newBoyfriendBtn, boyfriendBtn);
+    girlfriendBtn.parentNode.replaceChild(newGirlfriendBtn, girlfriendBtn);
+    
+    newBoyfriendBtn.addEventListener('click', ()=>setRole('boyfriend'));
+    newGirlfriendBtn.addEventListener('click', ()=>setRole('girlfriend'));
+    newBoyfriendBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); setRole('boyfriend'); }, {passive:false});
+    newGirlfriendBtn.addEventListener('touchstart', (e)=>{ e.preventDefault(); setRole('girlfriend'); }, {passive:false});
 
     const savedRole = localStorage.getItem('userRole');
     if (savedRole) setRole(savedRole);
@@ -118,7 +131,6 @@ function connectFirebase(config){
     localStorage.removeItem('firebaseConfig');
   }
 }
-
 function initApp(){
   setupTabs();
   setupPresence();
@@ -471,12 +483,13 @@ function setupSettings(){
   });
   
   // アプリリセット
-  document.getElementById('resetAppBtn').addEventListener('click', ()=>{
-    if(confirm('本当にアプリをリセットしますか？\n全てのデータが削除されます。')){
-      localStorage.clear();
-      location.reload();
-    }
-  });
+document.getElementById('resetAppBtn').addEventListener('click', ()=>{
+  if(confirm('本当にアプリをリセットしますか？\n全てのデータが削除されます。')){
+    localStorage.clear();
+    // ページを完全にリロード
+    window.location.href = window.location.href.split('?')[0];
+  }
+　});
 }
 
 function loadSettings(){
