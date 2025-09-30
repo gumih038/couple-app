@@ -1,0 +1,596 @@
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+}
+
+html, body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    overflow: hidden;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Firebase設定画面 */
+.firebase-setup { 
+    padding: 30px 20px;
+    height: 100%;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+}
+
+.firebase-setup h2 { 
+    color: #667eea; 
+    margin-bottom: 10px; 
+}
+
+.version-tag {
+    display: inline-block;
+    background: #10b981;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.setup-info {
+    background: #fef3c7;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.setup-input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+.setup-btn {
+    width: 100%;
+    padding: 20px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.setup-btn:active { 
+    background: #5568d3;
+    transform: scale(0.98); 
+}
+
+/* 役割選択画面 */
+.role-select {
+    padding: 40px 20px;
+    text-align: center;
+    height: 100%;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+}
+
+.role-select h1 {
+    color: #667eea;
+    margin-bottom: 10px;
+    font-size: 28px;
+}
+
+.role-select .version-tag {
+    margin-bottom: 30px;
+}
+
+.role-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.role-btn {
+    padding: 30px 50px;
+    font-size: 24px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    color: white;
+    font-weight: bold;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.role-btn.boyfriend {
+    background: linear-gradient(135deg, #667eea 0%, #4c63d2 100%);
+}
+
+.role-btn.girlfriend {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.role-btn:active { 
+    transform: scale(0.95); 
+}
+
+/* ヘッダー */
+.header {
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    flex-shrink: 0;
+}
+
+.header.boyfriend {
+    background: linear-gradient(135deg, #667eea 0%, #4c63d2 100%);
+}
+
+.header.girlfriend {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.header h2 { 
+    color: white; 
+    font-size: 18px; 
+}
+
+.online-status {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: white;
+    font-size: 11px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+}
+
+.status-dot.offline {
+    background: #9ca3af;
+}
+
+.status-dot.online {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* メインコンテンツ - スクロール修正 */
+.main-content {
+    flex: 1;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px;
+    padding-bottom: 40px;
+    background: #f8f9fa;
+    position: relative;
+}
+
+/* 通知設定案内 */
+.notification-guide {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.notification-guide strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #92400e;
+}
+
+.notification-guide ol {
+    margin-left: 20px;
+    color: #78350f;
+}
+
+.notification-guide li {
+    margin-bottom: 5px;
+}
+
+/* 気分セクション */
+.mood-section {
+    margin-bottom: 20px;
+}
+
+.mood-container {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.mood-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.mood-label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+}
+
+.time-label {
+    font-size: 11px;
+    color: #999;
+}
+
+.mood-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+
+.mood-btn {
+    flex: 1;
+    padding: 15px;
+    border: 3px solid #e5e7eb;
+    border-radius: 15px;
+    background: white;
+    font-size: 28px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.mood-btn span {
+    font-size: 11px;
+    color: #666;
+    font-weight: 600;
+}
+
+.mood-btn:active {
+    transform: scale(0.95);
+}
+
+.mood-btn.active {
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+.mood-btn.bad.active {
+    border-color: #ef4444;
+    background: #fef2f2;
+}
+
+.mood-btn.normal.active {
+    border-color: #f59e0b;
+    background: #fffbeb;
+}
+
+.mood-btn.good.active {
+    border-color: #10b981;
+    background: #f0fdf4;
+}
+
+/* 相手の気分表示 */
+.partner-mood-display {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.partner-mood-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.partner-mood-emoji {
+    font-size: 48px;
+}
+
+.partner-mood-text {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.partner-mood-text .label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+}
+
+.partner-mood-text .status {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.partner-mood-text .status.bad { 
+    color: #ef4444; 
+}
+
+.partner-mood-text .status.normal { 
+    color: #f59e0b; 
+}
+
+.partner-mood-text .status.good { 
+    color: #10b981; 
+}
+
+.partner-mood-text .time-label {
+    font-size: 11px;
+    color: #999;
+    margin-top: 3px;
+}
+
+/* 相手のステータス表示 */
+.partner-status-display {
+    background: white;
+    padding: 15px;
+    border-radius: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.partner-status-display .icon {
+    font-size: 24px;
+}
+
+.partner-status-display .status-info {
+    flex: 1;
+}
+
+.partner-status-display .text {
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+}
+
+.partner-status-display .time-label {
+    font-size: 11px;
+    color: #999;
+    margin-top: 3px;
+}
+
+/* ステータスボタン */
+.status-section {
+    margin-bottom: 20px;
+}
+
+.status-label {
+    font-size: 14px;
+    color: #666;
+    font-weight: 600;
+}
+
+.status-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.status-btn {
+    padding: 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    background: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.status-btn:active {
+    transform: scale(0.95);
+}
+
+.status-btn.active {
+    border-color: #667eea;
+    background: #eff6ff;
+    color: #667eea;
+    font-weight: bold;
+}
+
+/* 緊急ボタン */
+.emergency-section {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.emergency-btn {
+    flex: 1;
+    padding: 18px;
+    border: none;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    -webkit-tap-highlight-color: transparent;
+}
+
+.anxiety-btn {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+}
+
+.check-btn {
+    background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+}
+
+.emergency-btn:active { 
+    transform: scale(0.95); 
+}
+
+/* チャットセクション（小さく） */
+.chat-section {
+    background: white;
+    border-radius: 15px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.chat-label {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.chat-messages {
+    max-height: 150px;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+.message {
+    margin-bottom: 10px;
+    animation: slideIn 0.3s;
+    clear: both;
+}
+
+@keyframes slideIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+.message-content {
+    display: inline-block;
+    padding: 8px 12px;
+    border-radius: 12px;
+    max-width: 70%;
+    word-wrap: break-word;
+    font-size: 13px;
+}
+
+.message.boyfriend .message-content {
+    background: #667eea;
+    color: white;
+    border-bottom-left-radius: 5px;
+}
+
+.message.girlfriend .message-content {
+    background: #f093fb;
+    color: white;
+    border-bottom-right-radius: 5px;
+    float: right;
+}
+
+.message.system {
+    text-align: center;
+}
+
+.message.system .message-content {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 11px;
+    border-radius: 15px;
+}
+
+.message-time {
+    font-size: 10px;
+    color: #999;
+    margin-top: 3px;
+}
+
+.chat-input-section {
+    display: flex;
+    gap: 8px;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 2px solid #e5e7eb;
+    border-radius: 20px;
+    font-size: 13px;
+    outline: none;
+}
+
+.chat-input:focus {
+    border-color: #667eea;
+}
+
+.send-btn {
+    padding: 10px 20px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 13px;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.send-btn:active {
+    background: #4c63d2;
+}
+
+.hidden { 
+    display: none; 
+}
