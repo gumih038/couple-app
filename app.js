@@ -1,11 +1,25 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getDatabase, ref, set, onValue, push, remove, onDisconnect, update } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 
-let db;
+let db, storage;
 const ROOM_ID = 'couple_room_001';
 let userRole = '';
 let isPartnerOnline = false;
 let hasShownOnlineNotification = false;
+
+// 設定のデフォルト値
+let settings = {
+  notifyMood: true,
+  notifyStatus: true,
+  notifyMessage: true,
+  notifyOnline: true,
+  animateMessages: true,
+  showRead: true,
+  showTyping: true,
+  autoDelete: true,
+  compressImage: true
+};
 
 // 通知権限
 if ('Notification' in window && Notification.permission === 'default') {
@@ -28,6 +42,8 @@ if (document.readyState === 'loading'){
 }
 
 function bootstrap(){
+  loadSettings();
+  
   const cfgStr = localStorage.getItem('firebaseConfig');
   if (cfgStr){
     try{
@@ -45,9 +61,10 @@ function bootstrap(){
         apiKey: document.getElementById('apiKey').value.trim(),
         authDomain: document.getElementById('authDomain').value.trim(),
         projectId: document.getElementById('projectId').value.trim(),
-        databaseURL: document.getElementById('databaseURL').value.trim()
+        databaseURL: document.getElementById('databaseURL').value.trim(),
+        storageBucket: document.getElementById('storageBucket').value.trim()
       };
-      if (!config.apiKey || !config.authDomain || !config.projectId || !config.databaseURL){
+      if (!config.apiKey || !config.authDomain || !config.projectId || !config.databaseURL || !config.storageBucket){
         alert('すべての項目を入力してください');
         return;
       }
@@ -63,6 +80,7 @@ function connectFirebase(config){
   try{
     const app = initializeApp(config);
     db = getDatabase(app);
+    storage = getStorage(app);
 
     document.getElementById('firebaseSetup').classList.add('hidden');
     document.getElementById('roleSelect').classList.remove('hidden');
@@ -85,6 +103,8 @@ function connectFirebase(config){
         headerTitle.textContent = '👩 彼女モード';
         document.getElementById('partnerLabel').textContent = '彼氏の気分';
       }
+      
+      document.getElementById('currentRole').textContent = role === 'boyfriend' ? '彼氏' : '彼女';
       initApp();
     };
 
@@ -97,12 +117,13 @@ function connectFirebase(config){
     if (savedRole) setRole(savedRole);
 
   }catch(err){
-    alert('Firebase接続エラー ' + err.message);
+    alert('Firebase接続エラー: ' + err.message);
     localStorage.removeItem('firebaseConfig');
   }
 }
 
 function initApp(){
+  setupTabs();
   setupPresence();
   setupMoodButtons();
   setupStatusButtons();
@@ -110,6 +131,22 @@ function initApp(){
   setupTyping();
   setupTodos();
   subscribePartnerState();
+  setupSettings();
+}
+
+// タブ切り替え
+function setupTabs(){
+  const tabs = document.querySelectorAll('.tab-btn');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', function(){
+      tabs.forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      
+      const screenId = this.dataset.screen;
+      document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+      document.getElementById(screenId).classList.remove('hidden');
+    });
+  });
 }
 
 // Presence
@@ -135,7 +172,7 @@ function setupPresence(){
     document.querySelector('#partnerStatus .status-dot').classList.toggle('online', online);
     document.getElementById('partnerStatusText').textContent = online ? '相手: オンライン' : '相手: オフライン';
     
-    if (online && !wasOnline && hasShownOnlineNotification){
+    if (online && !wasOnline && hasShownOnlineNotification && settings.notifyOnline){
       showPush('💚 相手がオンラインになりました', '今ならすぐに返信が届きます');
     }
     hasShownOnlineNotification = true;
@@ -185,6 +222,7 @@ function setupChat(){
   const sendBtn = document.getElementById('sendBtn');
   const listEl = document.getElementById('chatMessages');
   const msgsRef = ref(db, `rooms/${ROOM_ID}/messages`);
+  const imageInput = document.getElementById('imageInput');
 
   const send = ()=>{
     const text = input.value.trim();
@@ -212,8 +250,53 @@ function setupChat(){
   });
 
   input.addEventListener('input', ()=>{
-    setTyping(true);
-    scheduleTypingOff();
+    if(settings.showTyping){
+      setTyping(true);
+      scheduleTypingOff();
+    }
+  });
+
+  // 画像送信
+  imageInput.addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('image/')){
+      alert('画像ファイルを選択してください');
+      return;
+    }
+    
+    if (file.size > 5 * 1024 * 1024){
+      alert('画像は5MB以下にしてください');
+      return;
+    }
+
+    try {
+      let uploadFile = file;
+      
+      // 画像圧縮
+      if (settings.compressImage && file.size > 500 * 1024){
+        uploadFile = await compressImage(file);
+      }
+      
+      const filename = `${ROOM_ID}/${Date.now()}_${file.name}`;
+      const imgRef = storageRef(storage, filename);
+      await uploadBytes(imgRef, uploadFile);
+      const url = await getDownloadURL(imgRef);
+      
+      const msgRef = push(msgsRef);
+      set(msgRef, {
+        type:'image',
+        from: userRole,
+        imageUrl: url,
+        ts: Date.now(),
+        readBy: { [userRole]: Date.now() }
+      });
+      
+      imageInput.value = '';
+    } catch (error) {
+      alert('画像の送信に失敗しました: ' + error.message);
+    }
   });
 
   onValue(msgsRef, snap=>{
@@ -224,13 +307,34 @@ function setupChat(){
 
     arr.forEach(([id,m])=>{
       const div = document.createElement('div');
+      
       if (m.type === 'system'){
         div.className = 'message system';
         div.innerHTML = `<div class="message-content">${escapeHTML(m.text)}</div><div class="message-time">${formatTime(m.ts)}</div>`;
+      }else if(m.type === 'image'){
+        const isYou = m.from === userRole;
+        div.className = `message ${isYou ? 'you':'partner'}`;
+        const read = settings.showRead && m.readBy && m.readBy[partnerRole] ? ' ✓' : '';
+        div.innerHTML = `
+          <div class="message-content">
+            <img src="${m.imageUrl}" class="message-image" onclick="window.open('${m.imageUrl}')" />
+          </div>
+          <div class="message-time">${formatTime(m.ts)}${read}</div>
+        `;
+        
+        if (!isYou && (!m.readBy || !m.readBy[userRole])){
+          const patch = {};
+          patch[`rooms/${ROOM_ID}/messages/${id}/readBy/${userRole}`] = Date.now();
+          update(ref(db), patch);
+          
+          if(settings.notifyMessage){
+            showPush('📷 新しい写真', '相手が写真を送りました');
+          }
+        }
       }else{
         const isYou = m.from === userRole;
         div.className = `message ${isYou ? 'you':'partner'}`;
-        const read = m.readBy && m.readBy[partnerRole] ? ' ✓' : '';
+        const read = settings.showRead && m.readBy && m.readBy[partnerRole] ? ' ✓' : '';
         div.innerHTML = `
           <div class="message-content">${linkify(escapeHTML(m.text))}</div>
           <div class="message-time">${formatTime(m.ts)}${read}</div>
@@ -241,12 +345,59 @@ function setupChat(){
           patch[`rooms/${ROOM_ID}/messages/${id}/readBy/${userRole}`] = Date.now();
           update(ref(db), patch);
           
-          showPush('💬 新しいメッセージ', m.text);
+          if(settings.notifyMessage){
+            showPush('💬 新しいメッセージ', m.text);
+          }
         }
       }
       listEl.appendChild(div);
     });
     listEl.scrollTop = listEl.scrollHeight;
+    
+    // 24時間後に自動削除
+    if(settings.autoDelete){
+      const oneDayAgo = Date.now() - 86400000;
+      arr.forEach(([id, m]) => {
+        if(m.ts < oneDayAgo){
+          remove(ref(db, `rooms/${ROOM_ID}/messages/${id}`));
+        }
+      });
+    }
+  });
+}
+
+// 画像圧縮
+async function compressImage(file){
+  return new Promise((resolve)=>{
+    const reader = new FileReader();
+    reader.onload = (e)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        const maxSize = 1200;
+        
+        if(width > height && width > maxSize){
+          height = (height / width) * maxSize;
+          width = maxSize;
+        }else if(height > maxSize){
+          width = (width / height) * maxSize;
+          height = maxSize;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob)=>{
+          resolve(new File([blob], file.name, {type: 'image/jpeg'}));
+        }, 'image/jpeg', 0.8);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
   });
 }
 
@@ -258,7 +409,9 @@ function setupTyping(){
   const partnerTypingRef = ref(db, `rooms/${ROOM_ID}/typing/${partnerRole}`);
   onValue(partnerTypingRef, snap=>{
     const v = !!snap.val();
-    document.getElementById('typingIndicator').textContent = v ? '✏️ 入力中...' : '';
+    if(settings.showTyping){
+      document.getElementById('typingIndicator').textContent = v ? '✏️ 入力中...' : '';
+    }
   });
 }
 
@@ -347,9 +500,9 @@ function subscribePartnerState(){
     s.classList.add(v.mood);
     document.getElementById('partnerMoodTime').textContent = formatTimeRelative(v.ts);
     
-    if (lastMood && lastMood !== v.mood){
+    if (lastMood && lastMood !== v.mood && settings.notifyMood){
       if (v.mood === 'bad'){
-        showPush('😔 気分の変化', `相手の気分があまり良くないようです`);
+        showPush('😔 気分の変化', '相手の気分があまり良くないようです');
       }
     }
     lastMood = v.mood;
@@ -362,7 +515,7 @@ function subscribePartnerState(){
     document.getElementById('partnerCurrentStatus').textContent = v.text || 'ステータス未設定';
     document.getElementById('partnerStatusTime').textContent = formatTimeRelative(v.ts);
     
-    if (lastStatus && lastStatus !== v.text){
+    if (lastStatus && lastStatus !== v.text && settings.notifyStatus){
       showPush('📍 ステータス更新', v.text);
     }
     lastStatus = v.text;
@@ -379,6 +532,61 @@ function subscribePartnerState(){
       if (v) document.getElementById('partnerStatusTime').textContent = formatTimeRelative(v.ts);
     }, { onlyOnce: true });
   }, 60000);
+}
+
+// 設定
+function setupSettings(){
+  // 設定値を反映
+  Object.keys(settings).forEach(key => {
+    const el = document.getElementById(key);
+    if(el) el.checked = settings[key];
+  });
+  
+  // 設定変更時に保存
+  Object.keys(settings).forEach(key => {
+    const el = document.getElementById(key);
+    if(el){
+      el.addEventListener('change', ()=>{
+        settings[key] = el.checked;
+        saveSettings();
+      });
+    }
+  });
+  
+  // チャット履歴削除
+  document.getElementById('clearChatBtn').addEventListener('click', ()=>{
+    if(confirm('チャット履歴を全て削除しますか？')){
+      remove(ref(db, `rooms/${ROOM_ID}/messages`));
+      alert('削除しました');
+    }
+  });
+  
+  // TODO履歴削除
+  document.getElementById('clearTodoBtn').addEventListener('click', ()=>{
+    if(confirm('TODO履歴を全て削除しますか？')){
+      remove(ref(db, `rooms/${ROOM_ID}/todos`));
+      alert('削除しました');
+    }
+  });
+  
+  // アプリリセット
+  document.getElementById('resetAppBtn').addEventListener('click', ()=>{
+    if(confirm('本当にアプリをリセットしますか？\n全てのデータが削除されます。')){
+      localStorage.clear();
+      location.reload();
+    }
+  });
+}
+
+function loadSettings(){
+  const saved = localStorage.getItem('appSettings');
+  if(saved){
+    settings = {...settings, ...JSON.parse(saved)};
+  }
+}
+
+function saveSettings(){
+  localStorage.setItem('appSettings', JSON.stringify(settings));
 }
 
 // Util
@@ -418,5 +626,5 @@ function escapeHTML(s){
 
 function linkify(text){
   const urlRe = /(https?:\/\/[^\s]+)/g;
-  return text.replace(urlRe, '<a href="$1" target="_blank" rel="noopener" style="color:#667eea;text-decoration:underline">$1</a>');
+  return text.replace(urlRe, '<a href="$1" target="_blank" rel="noopener" style="color:#fff;text-decoration:underline">$1</a>');
 }
